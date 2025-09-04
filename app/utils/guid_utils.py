@@ -9,6 +9,7 @@ USING_POSTGRES = os.getenv("DATABASE_URL", "").startswith("postgresql")
 class GUID(TypeDecorator):
     """Platform-independent UUID type: uses PostgreSQL UUID or CHAR(36) for SQLite."""
     impl = CHAR if not USING_POSTGRES else PG_UUID
+    cache_ok = True
 
     def load_dialect_impl(self, dialect):
         if USING_POSTGRES:

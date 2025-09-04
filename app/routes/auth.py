@@ -4,7 +4,7 @@ from app.models.user_model import User
 from app.extensions import db
 from app.schema.user_schema import User_schema
 
-user_schema = User_schema()
+user_schema = User_schema(session=db.session)
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -29,7 +29,7 @@ def register():
 
     return jsonify({"status": 201,
                     "message": "User created successfully",
-                    data: {
+                    "data": {
                         "token":access_token,
                         "user": user_schema.dump(user)
                     }}), 201
