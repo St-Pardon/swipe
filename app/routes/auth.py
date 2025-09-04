@@ -1,8 +1,11 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required
 from app.models.user_model import User
 from app.extensions import db, BLOCKLIST
 from app.schema.user_schema import User_schema
+from werkzeug.security import generate_password_hash
+from datetime import timedelta
+
 
 user_schema = User_schema(session=db.session)
 
@@ -58,3 +61,57 @@ def logout():
     jti = get_jwt()["jti"]
     BLOCKLIST.add(jti)
     return jsonify({"status": 200, "message": "Successfully logged out"}), 200
+
+@auth_bp.route("/forgot", methods=["POST"])
+def forgot():
+    data = request.get_json()
+    email = data.get("email")
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"status": 200,
+                        "message": "If a user exists, a password reset link has been sent."}), 200
+
+    # Generate a time-sensitive, stateless reset token
+    reset_token = create_access_token(
+        identity=str(user.id),
+        expires_delta=timedelta(hours=1), # The token expires in 1 hour
+        additional_claims={"type": "password_reset"}
+    )
+    
+    # In a real app, you would send this token in an email.
+    return jsonify({"status": 200,
+                    "message": "Password reset token generated.",
+                    "reset_token": reset_token}), 200
+
+@auth_bp.route("/reset", methods=["POST"])
+def reset():
+    data = request.get_json()
+    email = data.get("email")
+    reset_code = data.get("reset_code")
+    new_password = data.get("password")
+
+    # Find the user by their email and reset code
+    user = User.query.filter_by(email=email, reset_code=reset_code).first()
+
+    # Check if the user was found and if the code is still valid
+    if not user or user.reset_code_expires_at < datetime.utcnow():
+        return jsonify({"status": 400,
+                        "message": "Invalid or expired reset code."}), 400
+
+    # Check if a new password was provided
+    if not new_password:
+        return jsonify({"status": 400, "message": "New password is required"}), 400
+
+    # Hash the new password and update the user object
+    user.password = generate_password_hash(new_password)
+    
+    # Clear the reset code and its expiration to prevent reuse
+    user.reset_code = None
+    user.reset_code_expires_at = None
+    
+    # Commit the changes to the database
+    db.session.commit()
+
+    return jsonify({"status": 200, "message": "Password reset successful"}), 200
