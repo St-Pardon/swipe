@@ -1,6 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from marshmallow import fields, post_load
-from models.user_model import User
+from app.models.user_model import User
 
 
 class User_schema(SQLAlchemySchema):

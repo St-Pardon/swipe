@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify, request
-from models.user_model import User
-from extensions import db
-from schema.user_schema import User_schema
+from flask_jwt_extended import create_access_token
+from app.models.user_model import User
+from app.extensions import db
+from app.schema.user_schema import User_schema
 
 user_schema = User_schema()
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route("/api/auth/register", methods=["POST"])
+@auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
     try:
@@ -24,9 +25,11 @@ def register():
     db.session.add(user)
     db.session.commit()
 
+    access_token = create_access_token(identity=str(user.id))
+
     return jsonify({"status": 201,
                     "message": "User created successfully",
                     data: {
-                        "token":"",
+                        "token":access_token,
                         "user": user_schema.dump(user)
                     }}), 201
