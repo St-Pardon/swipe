@@ -5,3 +5,4 @@ from flask_marshmallow import Marshmallow
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
+BLOCKLIST = set()
