@@ -4,7 +4,6 @@ from app.extensions import db, migrate
 
 # import Blueprint
 from app.routes.base_route import base_bp
-from app.routes.auth import auth_bp
 
 def create_app():
     app = Flask(__name__)
@@ -16,7 +15,5 @@ def create_app():
 
     # Register Blueprint
     app.register_blueprint(base_bp)
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
-
 
     return app
