@@ -16,6 +16,8 @@ class User(db.Model):
     address = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    accounts = db.relationship('Account', back_populates='user', cascade="all, delete-orphan", lazy='dynamic')
+    virtual_cards = db.relationship('Virtual_Cards', back_populates='user', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):
