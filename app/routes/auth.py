@@ -118,3 +118,25 @@ def reset():
 
     return jsonify({"status": 200, "message": "Password reset successful"}), 200
 
+
+@auth_bp.route("/change_password", methods=["POST"])
+@jwt_required()
+def change_password():
+    data = request.get_json()
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    if not current_password or not new_password:
+        return jsonify({"status": 400, "message": "Current password and new password are required"}), 400
+
+    current_user = User.query.get(get_jwt_identity())
+    if not current_user.check_password(current_password):
+        return jsonify({"status": 401, "message": "Current password is incorrect"}), 401
+
+    if current_password == new_password:
+        return jsonify({"status": 400, "message": "New password cannot be the same as the current password"}), 400
+
+    current_user.password = generate_password_hash(new_password)
+    db.session.commit()
+
+    return jsonify({"status": 200, "message": "Password changed successfully"}), 200
