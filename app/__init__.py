@@ -5,6 +5,7 @@ from app.extensions import db, migrate
 
 # import Blueprint
 from app.routes.base_route import base_bp
+from app.routes.account import account_bp
 from app.routes.auth import auth_bp
 
 def create_app():
@@ -14,12 +15,13 @@ def create_app():
     # Init extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    jwt=JWTManager(app)
+    JWTManager(app)
 
 
     # Register Blueprint
     app.register_blueprint(base_bp)
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(account_bp, url_prefix="/api")
 
 
     return app

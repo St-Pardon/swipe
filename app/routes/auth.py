@@ -1,14 +1,10 @@
-import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, decode_token, get_jwt, get_jwt_identity, jwt_required
 from app.models.user_model import User
 from app.extensions import db, BLOCKLIST
 from app.schema.user_schema import User_schema
-from werkzeug.security import generate_password_hash
 from datetime import timedelta
 
-
-user_schema = User_schema(session=db.session)
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -16,6 +12,7 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     data = request.get_json()
     try:
+        user_schema = User_schema()
         user = user_schema.load(data)
     except Exception as e:
         return jsonify({"status": 400,
@@ -31,6 +28,7 @@ def register():
 
     access_token = create_access_token(identity=str(user.id))
 
+    user_schema = User_schema()
     return jsonify({"status": 201,
                     "message": "User created successfully",
                     "data": {
@@ -47,8 +45,9 @@ def login():
         return jsonify({"status": 401,
                         "message": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=str(user.id))
+    access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=1))
 
+    user_schema = User_schema()
     return jsonify({"status": 200,
                     "message": "Login successful",
                     "data": {
@@ -113,7 +112,7 @@ def reset():
     if not user:
         return jsonify({"status": 404, "message": "User not found"}), 404
 
-    user.password = generate_password_hash(new_password)
+    user.set_password(new_password)
     db.session.commit()
 
     return jsonify({"status": 200, "message": "Password reset successful"}), 200
@@ -136,7 +135,7 @@ def change_password():
     if current_password == new_password:
         return jsonify({"status": 400, "message": "New password cannot be the same as the current password"}), 400
 
-    current_user.password = generate_password_hash(new_password)
+    current_user.set_password(new_password)
     db.session.commit()
 
     return jsonify({"status": 200, "message": "Password changed successfully"}), 200

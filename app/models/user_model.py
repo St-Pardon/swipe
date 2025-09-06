@@ -2,6 +2,7 @@ from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.guid_utils import GUID
 import uuid
+from app.models.virtual_cards_model import VirtualCard
 
 
 class User(db.Model):
@@ -17,7 +18,7 @@ class User(db.Model):
     phone = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     accounts = db.relationship('Account', back_populates='user', cascade="all, delete-orphan", lazy='dynamic')
-    virtual_cards = db.relationship('Virtual_Cards', back_populates='user', cascade="all, delete-orphan")
+    virtual_cards = db.relationship('VirtualCard', back_populates='user', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):
