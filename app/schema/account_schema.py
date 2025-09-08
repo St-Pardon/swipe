@@ -4,6 +4,9 @@ from app.models.account_model import Account
 from app.schema.user_schema import User_schema
 from app.extensions import db
 
+# Define valid currency codes at the module level for reusability
+VALID_CURRENCY_CODES = ['NGN', 'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR']
+
 class AccountSchema(SQLAlchemySchema):
     class Meta:
         model = Account
@@ -46,9 +49,8 @@ class AccountSchema(SQLAlchemySchema):
     @validates('currency_code')
     def validate_currency_code(self, value, **kwargs):
         """Validate that currency code is a valid ISO code"""
-        valid_currency_codes = ['NGN', 'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR']
-        if value not in valid_currency_codes:
-            raise ValidationError(f"Invalid currency code. Must be one of: {', '.join(valid_currency_codes)}")
+        if value not in VALID_CURRENCY_CODES:
+            raise ValidationError(f"Invalid currency code. Must be one of: {', '.join(VALID_CURRENCY_CODES)}")
     
     @validates('accountType')
     def validate_account_type(self, value, **kwargs):

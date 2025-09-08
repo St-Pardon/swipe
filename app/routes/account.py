@@ -1,8 +1,10 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.account_model import Account
-from app.schema.account_schema import AccountSchema
+from app.models.user_model import User
+from app.schema.account_schema import AccountSchema, VALID_CURRENCY_CODES
 from app.extensions import db
+from app.utils.xconverter import apply_margins, fetch_exchange_rates, get_exchange_rate
 
 
 account_bp = Blueprint('account', __name__)
@@ -56,6 +58,7 @@ def create_account():
         db.session.rollback()
         # It's good practice to log the error here
         return jsonify({"status": 500, "message": str(e)}), 500
+
 
 @account_bp.route("/accounts", methods=["GET"])
 @jwt_required()
@@ -154,3 +157,106 @@ def update_account(id):
         # It's good practice to log the error here
         return jsonify({"status": 500, "message": str(e)}), 500
 
+@account_bp.route("/users//balances", methods=["GET"])
+@jwt_required()
+def get_balances():
+    """Retrieve all balances for the logged-in user from their various accounts."""
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                "status": 404,
+                "message": "User not found"
+            }), 404
+            
+        accounts = Account.query.filter_by(user_id=user_id).all()
+        balances = {}
+        for account in accounts:
+            currency = account.currency_code.lower()
+            balances[currency] = balances.get(currency, 0) + account.balance
+            
+        # Determine the currency of the default account
+        default_account = Account.query.filter_by(user_id=user_id, is_default=True).first()
+        default_currency = default_account.currency_code.lower() if default_account else None
+        
+        # Calculate total in default currency
+        total_in_default = 0.0
+        if default_currency:
+            for currency, balance in balances.items():
+                if currency == default_currency:
+                    total_in_default += balance
+                else:
+                    rate = get_exchange_rate(currency, default_currency)
+                    print(f"DEBUG: Converting {currency} to {default_currency} - Rate: {rate}")
+                    if rate is not None:
+                        total_in_default += balance * rate
+                    else:
+                        print(f"Could not get exchange rate for {currency} to {default_currency}")
+        
+        # Prepare response data
+        response_data = {}
+        for currency, balance in balances.items():
+            response_data[currency] = str(balance)
+            
+        response_data["currency"] = default_account.currency_code if default_account else None
+        response_data["total"] = str(round(total_in_default, 2)) if default_currency else None
+        
+        return jsonify({
+            "status": 200,
+            "message": "All balances retrieved successfully",
+            "data": response_data
+        }), 200
+    except Exception as e:
+        return jsonify({"status": 500, "message": str(e)}), 500
+
+@account_bp.route('/rates', methods=['GET'])
+@jwt_required(optional=True)
+def get_exchange_rates():
+    """Retrieve current exchange rates with applied margins"""
+    try:
+        base_currency = request.args.get('base')
+        user_id = get_jwt_identity()
+
+        if not base_currency:
+            if user_id:
+                # If user is logged in, try to get their default account's currency
+                default_account = Account.query.filter_by(user_id=user_id, is_default=True).first()
+                if default_account:
+                    base_currency = default_account.currency_code
+            
+            # Fallback to USD if no base currency is determined
+            if not base_currency:
+                base_currency = "USD"
+        
+        base_currency = base_currency.upper()
+        
+        # Fetch exchange rates (from cache or API)
+        rates = fetch_exchange_rates(base_currency)
+        if rates is None:
+            return jsonify({
+                "status": 500,
+                "message": "Failed to fetch exchange rates from provider"
+            }), 500
+        
+        # Apply margins and format rates for all supported currencies
+        formatted_rates = apply_margins(rates, base_currency, VALID_CURRENCY_CODES)
+        
+        # Prepare response
+        response_data = {
+            "currency": base_currency,
+            "rates": formatted_rates
+        }
+        
+        return jsonify({
+            "status": 200,
+            "message": "Retrieved current exchange rates successfully",
+            "data": response_data
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Unexpected error in get_exchange_rates: {str(e)}")
+        return jsonify({
+            "status": 500,
+            "message": "An unexpected error occurred"
+        }), 500
