@@ -16,11 +16,9 @@ class VirtualCard(db.Model):
     user = db.relationship('User', back_populates='virtual_cards')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
     account = db.relationship('Account', back_populates='virtual_cards')
-    
-    # New fields replacing the original card_type
     card_kind = db.Column(db.String(50), nullable=False)  # 'virtual' or 'physical'
     card_type = db.Column(db.String(50), nullable=False)  # 'debit' or 'credit'
-    
+  
     card_holder = db.Column(db.String(180), nullable=False)    
     _card_number = db.Column("card_number", db.LargeBinary, nullable=False)
     card_number_hash = db.Column(db.String(64), unique=True, nullable=False)
