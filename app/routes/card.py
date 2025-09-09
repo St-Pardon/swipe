@@ -134,27 +134,174 @@ def get_card(card_id):
 @card_bp.route("/cards", methods=["GET"])
 @jwt_required()
 def get_all_cards():
-    """Get all cards for the authenticated user"""
+    """Get all cards for the authenticated user with filtering, pagination and sorting"""
     try:
         user_id = get_jwt_identity()
         
-        # Fetch all cards for the user
-        cards = VirtualCard.query.filter_by(user_id=user_id).all()
+        # Get query parameters for filtering, pagination and sorting
+        page = request.args.get('page', 1, type=int)
+        size = request.args.get('size', 10, type=int)
+        card_kind = request.args.get('card_kind')
+        card_type = request.args.get('card_type')
+        is_active = request.args.get('is_active')
         
-        # Serialize the cards data
+        # Validate pagination parameters
+        if page < 1:
+            page = 1
+        if size < 1 or size > 100:  # Limit max size to 100
+            size = 10
+            
+        # Build the base query
+        query = VirtualCard.query.filter_by(user_id=user_id)
+        
+        if card_kind:
+            query = query.filter(VirtualCard.card_kind == card_kind)
+        if card_type:
+            query = query.filter(VirtualCard.card_type == card_type)
+        if is_active is not None:
+            is_active_bool = is_active.lower() in ['true', '1', 'yes']
+            query = query.filter(VirtualCard.is_active == is_active_bool)
+        
+        cards = query.paginate(page=page, per_page=size, error_out=False)
+        
         card_schema = VirtualCardSchema(many=True)
-        result = card_schema.dump(cards)
+        result = card_schema.dump(cards.items)
         
         return jsonify({
             "status": 200,
             "message": "Cards retrieved successfully",
             "data": result,
-            "count": len(result)
         }), 200
         
     except Exception as e:
         return jsonify({
             "status": 500,
             "message": "An error occurred while retrieving the cards",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/card/<string:card_id>/deactivate", methods=["PATCH"])
+@jwt_required()
+def deactivate_card(card_id):
+    """Deactivate a specific card"""
+    try:
+        user_id = get_jwt_identity()
+        
+        card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+        
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+        
+        # Check if card is already inactive
+        if not card.is_active:
+            return jsonify({
+                "status": 400,
+                "message": "Card is already deactivated"
+            }), 400
+        
+        # Deactivate the card
+        card.is_active = False
+        db.session.commit()
+        
+        card_schema = VirtualCardSchema()
+        result = card_schema.dump(card)
+        
+        return jsonify({
+            "status": 200,
+            "message": "Card deactivated successfully",
+            "data": result
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while deactivating the card",
+            "error": str(e)
+        }), 500
+
+
+@card_bp.route("/card/<string:card_id>/reveal", methods=["POST"])
+@jwt_required()
+def reveal_full_card_number(card_id):
+    """Get full card number with PIN verification"""
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        # Validate PIN is provided
+        if not data or not data.get('pin'):
+            return jsonify({
+                "status": 400,
+                "message": "PIN is required"
+            }), 400
+        
+        provided_pin = data.get('pin')
+        
+        # Fetch the card and verify it belongs to the authenticated user
+        card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+        
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+        
+        # Verify the PIN
+        if card.pin != provided_pin:
+            return jsonify({
+                "status": 401,
+                "message": "Invalid PIN"
+            }), 401
+        
+        # Return the full card number
+        return jsonify({
+            "status": 200,
+            "message": "Card number revealed successfully",
+            "data": {
+                "card_id": card.id,
+                "card_number": card.card_number,  # This will decrypt and return the full number
+                "card_holder": card.card_holder,
+                "expiration_date": card.expiration_date
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while revealing the card number",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/card/<string:id>", methods=["DELETE"])
+@jwt_required()
+def delete_card(id):
+    """Delete a specific card"""
+    try:
+        user_id = get_jwt_identity()
+        card = VirtualCard.query.filter_by(id=id, user_id=user_id).first()
+
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+
+        db.session.delete(card)
+        db.session.commit()
+
+        return jsonify({
+            "status": 200,
+            "message": "Card deleted successfully"
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while revealing the card number",
             "error": str(e)
         }), 500

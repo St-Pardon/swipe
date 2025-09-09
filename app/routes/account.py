@@ -157,7 +157,7 @@ def update_account(id):
         # It's good practice to log the error here
         return jsonify({"status": 500, "message": str(e)}), 500
 
-@account_bp.route("/users//balances", methods=["GET"])
+@account_bp.route("/balances", methods=["GET"])
 @jwt_required()
 def get_balances():
     """Retrieve all balances for the logged-in user from their various accounts."""
@@ -260,3 +260,33 @@ def get_exchange_rates():
             "status": 500,
             "message": "An unexpected error occurred"
         }), 500
+
+@account_bp.route("/wallets/balance", methods=["GET"])
+@jwt_required()
+def get_default_account_balance():
+    """Retrieve balance and currency for the user's default account."""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Find the default account for the user
+        default_account = Account.query.filter_by(user_id=user_id, is_default=True).first()
+        
+        if not default_account:
+            return jsonify({
+                "status": 404,
+                "message": "No default account found for this user."
+            }), 404
+
+        response_data = {
+            "balance": default_account.balance,
+            "currency": default_account.currency_code
+        }
+
+        return jsonify({
+            "status": 200,
+            "message": "Default account balance retrieved successfully",
+            "data": response_data
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"Error in get_default_account_balance: {str(e)}")
+        return jsonify({"status": 500, "message": "An error occurred while retrieving the balance."}), 500
