@@ -87,7 +87,6 @@ def fetch_exchange_rates(base_currency):
         current_app.logger.error(f"Unexpected error: {str(e)}")
         return None
 
-# Margins are set to approximate your example (1 USD = 1514 NGN, buy at 1490, sell at 1530)
 # 'buyPrice' is what the bank pays for foreign currency (lower rate).
 BUY_MARGIN_PERCENT = 0.0158
 # 'sellPrice' is what the bank charges for foreign currency (higher rate).

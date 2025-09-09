@@ -7,6 +7,8 @@ from app.extensions import db, migrate
 from app.routes.base_route import base_bp
 from app.routes.account import account_bp
 from app.routes.auth import auth_bp
+from app.routes.users import user_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -22,6 +24,6 @@ def create_app():
     app.register_blueprint(base_bp)
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(account_bp, url_prefix="/api")
-
+    app.register_blueprint(user_bp, url_prefix="/api")
 
     return app
