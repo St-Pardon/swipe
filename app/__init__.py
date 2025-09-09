@@ -8,6 +8,7 @@ from app.routes.base_route import base_bp
 from app.routes.account import account_bp
 from app.routes.auth import auth_bp
 from app.routes.users import user_bp
+from app.routes.card import card_bp
 
 
 def create_app():
@@ -25,5 +26,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(account_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api")
+    app.register_blueprint(card_bp, url_prefix="/api")
 
     return app

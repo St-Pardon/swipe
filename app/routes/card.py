@@ -1,0 +1,160 @@
+import random
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from app.extensions import db
+from app.models.virtual_cards_model import VirtualCard
+from app.schema.virtual_cards_schema import VirtualCardSchema
+from app.models.account_model import Account
+from app.models.user_model import User  # Import the User model
+
+card_bp = Blueprint("card", __name__)
+
+@card_bp.route("/card", methods=["POST"])
+@jwt_required()
+def create_card():
+    try:
+        data = request.get_json()
+        user_id = get_jwt_identity()
+        
+        # Fetch the user to get their name
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                "status": 404,
+                "message": "User not found"
+            }), 404
+        
+        card_schema = VirtualCardSchema()
+        errors = card_schema.validate(data)
+        if errors:
+            return jsonify({
+                "status": 400, 
+                "message": "Invalid data", 
+                "errors": errors
+                }), 400
+        
+        account_id = data.get("account_id")
+        if not account_id:
+            return jsonify({
+                "status": 400, 
+                "message": "Account ID is required"
+                }), 400
+        
+        # Check if the account belongs to the user
+        account = Account.query.filter_by(id=account_id, user_id=user_id).first()
+        if not account:
+            return jsonify({
+                "status": 403,
+                "message": "You don't have permission to create a card for this account"
+            }), 403
+        
+        # If this card should be the default, unset the current default.
+        if data.get("is_default"):
+            VirtualCard.query.filter_by(user_id=user_id, is_default=True).update({"is_default": False})
+        
+        # Prepare data for the model by filtering out non-model fields
+        model_fields = [column.name for column in VirtualCard.__table__.columns]
+        card_data = {k: v for k, v in data.items() if k in model_fields}
+        
+
+        card_data['user_id'] = user_id
+        card_data['card_holder'] = user.name  # Get full name from user or maybe account
+        
+        # Generate a card number if not provided
+        if 'card_number' not in card_data:
+            card_data['card_number'] = VirtualCard.generate_card_number(user_id)
+        
+        # Generate a CVV if not provided
+        if '_cvv' not in card_data and 'cvv' not in card_data:
+            cvv = f"{random.randint(0, 999):03d}"
+            card_data['cvv'] = cvv
+        
+        # Create a new card instance
+        new_card = VirtualCard(**card_data)
+
+        db.session.add(new_card)
+        db.session.commit()
+        
+        result = card_schema.dump(new_card)
+        
+        return jsonify({
+            "status": 201,
+            "message": "Card created successfully",
+            "data": result
+        }), 201
+        
+    except ValueError as e:
+        return jsonify({
+            "status": 400,
+            "message": str(e)
+        }), 400
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while creating the card",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/card/<string:card_id>", methods=["GET"])
+@jwt_required()
+def get_card(card_id):
+    """Get a specific card by ID"""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Fetch the card and verify it belongs to the authenticated user
+        card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+        
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+        
+        # Serialize the card data
+        card_schema = VirtualCardSchema()
+        result = card_schema.dump(card)
+        
+        return jsonify({
+            "status": 200,
+            "message": "Card retrieved successfully",
+            "data": result
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while retrieving the card",
+            "error": str(e)
+        }), 500
+
+
+@card_bp.route("/cards", methods=["GET"])
+@jwt_required()
+def get_all_cards():
+    """Get all cards for the authenticated user"""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Fetch all cards for the user
+        cards = VirtualCard.query.filter_by(user_id=user_id).all()
+        
+        # Serialize the cards data
+        card_schema = VirtualCardSchema(many=True)
+        result = card_schema.dump(cards)
+        
+        return jsonify({
+            "status": 200,
+            "message": "Cards retrieved successfully",
+            "data": result,
+            "count": len(result)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while retrieving the cards",
+            "error": str(e)
+        }), 500
