@@ -26,7 +26,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    access_token = create_access_token(identity=str(user.id))
+    access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role}, expires_delta=timedelta(days=1))
 
     user_schema = User_schema()
     return jsonify({"status": 201,
@@ -45,7 +45,7 @@ def login():
         return jsonify({"status": 401,
                         "message": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=1))
+    access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role}, expires_delta=timedelta(days=1))
 
     user_schema = User_schema()
     return jsonify({"status": 200,

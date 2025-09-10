@@ -14,11 +14,15 @@ class User(db.Model):
     country = db.Column(db.String(120), nullable=False)
     countryCode = db.Column(db.String(120), nullable=False)
     city = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(120), nullable=False, default='user')
     address = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     accounts = db.relationship('Account', back_populates='user', cascade="all, delete-orphan", lazy='dynamic')
     virtual_cards = db.relationship('VirtualCard', back_populates='user', cascade="all, delete-orphan")
+    beneficiaries = db.relationship('Beneficiaries', back_populates='user', cascade="all, delete-orphan")
+    payment_methods = db.relationship('PaymentMethod', back_populates='user', cascade="all, delete-orphan")
+    transactions = db.relationship('Transaction', back_populates='user', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):

@@ -9,6 +9,8 @@ from app.routes.account import account_bp
 from app.routes.auth import auth_bp
 from app.routes.users import user_bp
 from app.routes.card import card_bp
+from app.routes.payment import payment_bp
+from app.routes.transaction import transaction_bp
 
 
 def create_app():
@@ -27,5 +29,7 @@ def create_app():
     app.register_blueprint(account_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api")
     app.register_blueprint(card_bp, url_prefix="/api")
+    app.register_blueprint(payment_bp, url_prefix="/api")
+    app.register_blueprint(transaction_bp, url_prefix="/api")
 
     return app

@@ -27,6 +27,8 @@ class Account(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     virtual_cards = db.relationship('VirtualCard', back_populates='account', cascade="all, delete-orphan")
+    beneficiaries = db.relationship('Beneficiaries', back_populates='account', cascade="all, delete-orphan")
+    transactions = db.relationship('Transaction', back_populates='account', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     _key_from_config = ACCOUNT_ENCRYPTION_KEY

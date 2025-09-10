@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
-from marshmallow import fields, post_load
+from marshmallow import fields, post_load, validate
 from app.models.user_model import User
 from app.models.account_model import Account
 from app.extensions import db
@@ -21,6 +21,7 @@ class User_schema(SQLAlchemySchema):
     country = auto_field()
     countryCode = auto_field()
     city = auto_field()
+    role = auto_field(load_default='user', validate=validate.OneOf(['user', 'admin']))
     address = auto_field()
     phone = auto_field()
 
