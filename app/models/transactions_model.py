@@ -13,7 +13,7 @@ class Transaction(db.Model):
     payment_method = db.relationship('PaymentMethod', back_populates='transactions')
     beneficiary_id = db.Column(GUID(), db.ForeignKey('beneficiaries.id'), nullable=True)
     beneficiary = db.relationship('Beneficiaries', back_populates='transactions')
-    invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=True)
+    # invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=True)
     type = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -22,7 +22,7 @@ class Transaction(db.Model):
     currency_code = db.Column(db.String(3), nullable=False)
     transction_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, nullable=False)
-    view = db.relationship('transactionView', back_populates='transaction', cascade='all, delete-orphan')
+    view = db.relationship('TransactionView', back_populates='transaction', cascade='all, delete-orphan')
 
 
 
@@ -32,6 +32,6 @@ class TransactionView(db.Model):
     transaction_id = db.Column(GUID(), db.ForeignKey('transaction.id'), nullable=False)
     transaction = db.relationship('Transaction', back_populates='view')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
-    account = db.relationship('Account', back_populates='views')
+    account = db.relationship('Account', back_populates='view')
     view_type = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)

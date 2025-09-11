@@ -184,7 +184,7 @@ def create_benefitiary(id):
             }), 500
 
 # get beneficiaries
-@user_bp.routes("/user/<string:id>/beneficiaries", methods=["GET"])
+@user_bp.route("/user/<string:id>/beneficiaries", methods=["GET"])
 @jwt_required()
 def get_beneficiaries(id):
     try:
@@ -294,7 +294,7 @@ def update_beneficiary(id, beneficiary_id):
 
 
 # delete beneficiary
-@user_bp.route("user/<string:id/beneficiary/<string:beneficiary_id>", methods=["DELETE"])
+@user_bp.route("/user/<string:id>/beneficiary/<string:beneficiary_id>", methods=["DELETE"])
 @jwt_required()
 def delete_beneficiary(id, beneficiary_id):
     try:

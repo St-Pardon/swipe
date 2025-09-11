@@ -13,7 +13,7 @@ transaction_bp = Blueprint("transaction", __name__)
 def create_transaction():
     pass
 
-@transaction_bp("/transactions", method="GET")
+@transaction_bp.route("/transactions", methods=["GET"])
 @jwt_required()
 def get_transactions():
     """Get all transactions for the authenticated user with filtering, pagination and sorting"""
@@ -63,7 +63,7 @@ def get_transactions():
             "error": str(e)
         }), 500
 
-@transaction_bp("/transaction/<string:id>", method="GET")
+@transaction_bp.route("/transaction/<string:id>", methods=["GET"])
 @jwt_required()
 def get_transaction(id):
     """Get a specific transaction by ID"""
@@ -93,7 +93,7 @@ def get_transaction(id):
             "error": str(e)
         }), 500
 
-@transaction_bp("/transaction/<string:id>", method="DELETE")
+@transaction_bp.route("/transaction/<string:id>", methods=["DELETE"])
 @jwt_required()
 def delete_transaction(id):
     """Delete a specific transaction by ID"""

@@ -1,6 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from marshmallow import fields, validate
-from extensions import db
+from app.extensions import db
 from app.models.transactions_model import Transaction
 from app.schema.account_schema import AccountSchema
 from app.schema.user_schema import User_schema
@@ -18,7 +18,7 @@ class TransactionSchema(SQLAlchemySchema):
     credit_account_id = auto_field(load_only=True)
     payment_method_id = auto_field(load_only=True)
     beneficiary_id = auto_field(load_only=True)
-    invoice_id = auto_field(load_only=True)
+    # invoice_id = auto_field(load_only=True)
     type = auto_field(required=True, validate=validate.OneOf(['deposit', 'withdrawal', 'transfer', 'payment']))
     status = auto_field(required=True, validate=validate.OneOf(['pending', 'completed', 'failed', 'cancelled']))
     amount = auto_field(required=True, validate=validate.Range(min=0.01))
