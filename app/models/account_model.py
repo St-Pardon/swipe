@@ -27,8 +27,9 @@ class Account(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     virtual_cards = db.relationship('VirtualCard', back_populates='account', cascade="all, delete-orphan")
-    beneficiaries = db.relationship('Beneficiaries', back_populates='account', cascade="all, delete-orphan")
-    transactions = db.relationship('Transaction', back_populates='account', cascade="all, delete-orphan")
+    debit_transactions = db.relationship('Transaction', foreign_keys='Transaction.debit_account_id', back_populates='debit_account', cascade="all, delete-orphan")
+    credit_transactions = db.relationship('Transaction', foreign_keys='Transaction.credit_account_id', back_populates='credit_account', cascade="all, delete-orphan")
+    view = db.relationship('TransactionView', back_populates='account')
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     _key_from_config = ACCOUNT_ENCRYPTION_KEY

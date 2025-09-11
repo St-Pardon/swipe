@@ -1,30 +1,37 @@
-from extensions import db
-from utils.guid_utils import GUID
+from app.extensions import db
+from app.utils.guid_utils import GUID
 
 class Transaction(db.Model):
     id = db.Column(GUID(), primary_key=True)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('transactions', lazy=True))
-    debit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
-    credit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
-    account = db.relationship('Account', backref=db.backref('transactions', lazy=True))
-    payment_method_id = db.Column(GUID(), db.ForeignKey('payment_method.id'), nullable=False)
-    # payment_method = db.relationship('PaymentMethod', backref=db.backref('transactions', lazy=True))
-    beneficiary_id = db.Column(GUID(), db.ForeignKey('beneficiary.id'), nullable=False)
-    invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=False)
+    user = db.relationship('User', back_populates='transactions')
+    debit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=True)
+    credit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=True)
+    debit_account = db.relationship('Account', foreign_keys=[debit_account_id], back_populates='debit_transactions')
+    credit_account = db.relationship('Account', foreign_keys=[credit_account_id], back_populates="credit_transactions")
+    payment_method_id = db.Column(GUID(), db.ForeignKey('payment_method.id'))
+    payment_method = db.relationship('PaymentMethod', back_populates='transactions')
+    beneficiary_id = db.Column(GUID(), db.ForeignKey('beneficiaries.id'), nullable=True)
+    beneficiary = db.relationship('Beneficiaries', back_populates='transactions')
+    invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=True)
     type = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    fee = db.Column(db.Float, nullable=False)
+    fee = db.Column(db.Float, nullable=False, default=0.0)
     description = db.Column(db.Text)
     currency_code = db.Column(db.String(3), nullable=False)
-    metadata = db.Column(db.JSON)
+    transction_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, nullable=False)
+    view = db.relationship('transactionView', back_populates='transaction', cascade='all, delete-orphan')
 
 
-class transactionView(db.Model):
+
+
+class TransactionView(db.Model):
     id = db.Column(GUID(), primary_key=True)
     transaction_id = db.Column(GUID(), db.ForeignKey('transaction.id'), nullable=False)
+    transaction = db.relationship('Transaction', back_populates='view')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
+    account = db.relationship('Account', back_populates='views')
     view_type = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)

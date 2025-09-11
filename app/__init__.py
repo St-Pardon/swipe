@@ -12,6 +12,7 @@ from app.routes.card import card_bp
 from app.routes.payment import payment_bp
 from app.routes.transaction import transaction_bp
 
+from app import models
 
 def create_app():
     app = Flask(__name__)
