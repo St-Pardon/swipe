@@ -7,6 +7,7 @@ from app.models.payment_intent_model import PaymentIntent
 from app.models.payout_model import Payout
 from app.models.account_model import Account
 from app.models.user_model import User
+from app.models.virtual_cards_model import VirtualCard
 from app.extensions import db
 
 # Configure Stripe
@@ -306,7 +307,7 @@ class PaymentService:
             payment_intent.update_status('succeeded')
             
             # Update account balance for wallet funding
-            if payment_intent.intent_type == 'wallet_funding' and payment_intent.account:
+            if payment_intent.intent_type in ['wallet_funding', 'card_funding'] and payment_intent.account:
                 payment_intent.account.balance += payment_intent.amount
                 logger.info(f"Added {payment_intent.amount} {payment_intent.currency} to account {payment_intent.account_id}")
             
@@ -328,6 +329,133 @@ class PaymentService:
         """Get payment intent by Stripe ID"""
         return PaymentIntent.query.filter_by(gateway_intent_id=payment_intent_id).first()
     
+    @staticmethod
+    def create_card_payment_intent(user_id, card_id, amount, currency, description=None, metadata=None):
+        """
+        Create a payment intent for card-based wallet funding
+        
+        Args:
+            user_id: User ID
+            card_id: Virtual card ID to use for payment
+            amount: Payment amount
+            currency: Payment currency
+            description: Optional description
+            metadata: Optional metadata dict
+            
+        Returns:
+            tuple: (PaymentIntent object, client_secret)
+        """
+        try:
+            # Validate amount and currency
+            is_valid, error_msg = PaymentConfig.validate_amount(amount, currency)
+            if not is_valid:
+                raise ValueError(error_msg)
+            
+            # Verify card belongs to user and is active
+            card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+            if not card:
+                raise ValueError("Card not found or doesn't belong to user")
+            
+            if not card.is_active:
+                raise ValueError("Card is not active")
+            
+            # Check spending limit
+            if card.spending_limit and amount > card.spending_limit:
+                raise ValueError(f"Amount exceeds card spending limit of {card.spending_limit}")
+            
+            # Verify card has Stripe payment method
+            if not card.stripe_payment_method_id:
+                raise ValueError("Card is not linked to a payment method")
+            
+            # Create Stripe payment intent with the card's payment method
+            stripe_intent = stripe.PaymentIntent.create(
+                amount=int(amount * 100),  # Convert to cents
+                currency=currency.lower(),
+                description=description or f'Fund wallet using card ending in {card.card_number[-4:]}',
+                payment_method=card.stripe_payment_method_id,
+                confirmation_method='manual',
+                confirm=True,
+                metadata={
+                    'user_id': str(user_id),
+                    'card_id': str(card_id),
+                    'account_id': str(card.account_id),
+                    'type': 'card_funding',
+                    **(metadata or {})
+                }
+            )
+            
+            # Create local payment intent record
+            payment_intent = PaymentIntent(
+                user_id=user_id,
+                account_id=card.account_id,
+                virtual_card_id=card_id,
+                amount=amount,
+                currency=currency.upper(),
+                intent_type='card_funding',
+                description=description,
+                gateway_intent_id=stripe_intent.id,
+                client_secret=stripe_intent.client_secret,
+                status=stripe_intent.status,
+                payment_method_id=card.stripe_payment_method_id,
+                payment_method_type='card'
+            )
+            
+            # Store metadata as JSON string for SQLite compatibility
+            if metadata:
+                import json
+                payment_intent.meta_data = json.dumps(metadata)
+            
+            db.session.add(payment_intent)
+            db.session.commit()
+            
+            logger.info(f"Created card payment intent {stripe_intent.id} for user {user_id} using card {card_id}")
+            
+            return payment_intent, stripe_intent.client_secret
+            
+        except stripe.error.StripeError as e:
+            logger.error(f"Stripe error creating card payment intent: {str(e)}")
+            db.session.rollback()
+            raise Exception(f"Card payment processing error: {str(e)}")
+        except Exception as e:
+            logger.error(f"Error creating card payment intent: {str(e)}")
+            db.session.rollback()
+            raise
+    
+    @staticmethod
+    def process_card_payment(user_id, card_id, amount, currency, description=None):
+        """
+        Process an immediate card payment (for direct transactions)
+        
+        Args:
+            user_id: User ID
+            card_id: Virtual card ID
+            amount: Payment amount
+            currency: Payment currency
+            description: Optional description
+            
+        Returns:
+            PaymentIntent object
+        """
+        try:
+            # Create and confirm payment intent in one step
+            payment_intent, client_secret = PaymentService.create_card_payment_intent(
+                user_id=user_id,
+                card_id=card_id,
+                amount=amount,
+                currency=currency,
+                description=description
+            )
+            
+            # If payment succeeded, update account balance
+            if payment_intent.status == 'succeeded':
+                PaymentService.handle_successful_payment(payment_intent.gateway_intent_id)
+            
+            return payment_intent
+            
+        except Exception as e:
+            logger.error(f"Error processing card payment: {str(e)}")
+            raise
+
     @staticmethod
     def get_payout_by_id(payout_id):
         """Get payout by Stripe ID"""
