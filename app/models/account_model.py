@@ -7,7 +7,11 @@ from cryptography.fernet import Fernet
 from app.config import Config
 from app.models.virtual_cards_model import VirtualCard
 
-ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
+# Access config values safely
+try:
+    ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
+except AttributeError:
+    ACCOUNT_ENCRYPTION_KEY = 'BRuYcPA0S5C9cVmrMV96HZ98fyZUp9U_wTc9izk1YIk='
 
 
 class Account(db.Model):
@@ -30,6 +34,8 @@ class Account(db.Model):
     debit_transactions = db.relationship('Transaction', foreign_keys='Transaction.debit_account_id', back_populates='debit_account', cascade="all, delete-orphan")
     credit_transactions = db.relationship('Transaction', foreign_keys='Transaction.credit_account_id', back_populates='credit_account', cascade="all, delete-orphan")
     view = db.relationship('TransactionView', back_populates='account')
+    payment_intents = db.relationship('PaymentIntent', back_populates='account', cascade="all, delete-orphan")
+    payouts = db.relationship('Payout', back_populates='account', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     _key_from_config = ACCOUNT_ENCRYPTION_KEY

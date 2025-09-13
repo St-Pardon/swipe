@@ -7,8 +7,13 @@ from app.config import Config
 from cryptography.fernet import Fernet
 from app.utils.generators import AccountNumberGenerator
 
-secret_key = Config.SECRET_KEY
-ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
+# Access config values safely
+try:
+    secret_key = Config.SECRET_KEY
+    ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
+except AttributeError:
+    secret_key = 'dev-secret-key'
+    ACCOUNT_ENCRYPTION_KEY = 'BRuYcPA0S5C9cVmrMV96HZ98fyZUp9U_wTc9izk1YIk='
 
 class VirtualCard(db.Model):
     id = db.Column(GUID(), primary_key=True, default=uuid.uuid4)
@@ -16,6 +21,7 @@ class VirtualCard(db.Model):
     user = db.relationship('User', back_populates='virtual_cards')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)
     account = db.relationship('Account', back_populates='virtual_cards')
+    payment_intents = db.relationship('PaymentIntent', back_populates='virtual_card', cascade="all, delete-orphan")
     card_kind = db.Column(db.String(50), nullable=False)  # 'virtual' or 'physical'
     card_type = db.Column(db.String(50), nullable=False)  # 'debit' or 'credit'
   
@@ -28,14 +34,21 @@ class VirtualCard(db.Model):
     spending_limit = db.Column(db.Float, nullable=True)
     is_default = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+    stripe_payment_method_id = db.Column(db.String(255), nullable=True)  # Stripe payment method ID
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     
     _key_from_config = ACCOUNT_ENCRYPTION_KEY
     if not _key_from_config:
         _encryption_key = Fernet.generate_key()
     else:
-        # Key from config must be encoded to bytes use script.py to generate key
-        _encryption_key = _key_from_config.encode('utf-8')
+        # Key from config should be a base64-encoded string
+        try:
+            _encryption_key = _key_from_config.encode('utf-8')
+            # Test if it's a valid Fernet key
+            Fernet(_encryption_key)
+        except Exception:
+            # If invalid, generate a new key
+            _encryption_key = Fernet.generate_key()
     _cipher_suite = Fernet(_encryption_key)
     
     def __init__(self, **kwargs):

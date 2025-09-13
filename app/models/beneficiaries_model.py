@@ -13,3 +13,4 @@ class Beneficiaries(db.Model):
     beneficiary_name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     transactions = db.relationship('Transaction', back_populates='beneficiary')
+    payouts = db.relationship('Payout', back_populates='beneficiary', cascade="all, delete-orphan")
