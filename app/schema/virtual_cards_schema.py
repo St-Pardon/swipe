@@ -27,6 +27,8 @@ class VirtualCardSchema(SQLAlchemySchema):
     created_at = auto_field(dump_only=True)
     user = fields.Nested(User_schema(only=("id", "name", "email")), dump_only=True)
     account = fields.Nested(AccountSchema(only=("id", "account_number", "bank_name")), dump_only=True)
+    # Optional Stripe payment method id supplied by client when they have already created it client-side
+    stripe_payment_method_id = fields.String(load_only=True, required=False, validate=validate.Regexp(r'^pm_'))
     
     def get_masked_card_number(self, obj):
         """Return a masked version of the card number for display."""

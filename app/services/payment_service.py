@@ -10,8 +10,8 @@ from app.models.user_model import User
 from app.models.virtual_cards_model import VirtualCard
 from app.extensions import db
 
-# Configure Stripe
-stripe.api_key = PaymentConfig.STRIPE_SECRET_KEY
+# Configure Stripe with validation
+stripe_key = PaymentConfig.STRIPE_SECRET_KEY
 
 logger = logging.getLogger(__name__)
 

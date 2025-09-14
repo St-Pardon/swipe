@@ -10,32 +10,26 @@ from werkzeug.security import generate_password_hash
 class User_schema(SQLAlchemySchema):
     class Meta:
         model = User
-        load_instance = True
         sqla_session = db.session
 
     id = auto_field(dump_only=True)
     email = auto_field()
     password = fields.String(load_only=True, required=True)
     name = auto_field()
-    accountType = auto_field()
+    accountType = auto_field(validate=validate.OneOf(['freelancer', 'company']))
     country = auto_field()
     countryCode = auto_field()
     city = auto_field()
-    role = auto_field(load_default='user', validate=validate.OneOf(['user', 'admin']))
+    role = auto_field(validate=validate.OneOf(['user', 'admin']))
     address = auto_field()
     phone = auto_field()
 
     @post_load
-    def hash_password(self, user, **kwargs):
+    def create_user(self, data, **kwargs):
         """
-        Hashes the password of the User instance after it has been loaded
-        and assigns the hashed password back to the user object.
-        
-        Args:
-            user (User): The User model instance created by Marshmallow.
-                         This is the object we modify before it's committed.
+        Creates a User instance and hashes the password.
         """
-        # user.password is the plain-text password from the loaded data.
-        # We use the model's set_password method to hash it.
-        user.set_password(user.password)
+        password = data.pop('password')
+        user = User(**data)
+        user.set_password(password)
         return user
