@@ -8,11 +8,7 @@ from app.config import Config
 from app.models.virtual_cards_model import VirtualCard
 
 # Access config values safely
-try:
-    ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
-except AttributeError:
-    ACCOUNT_ENCRYPTION_KEY = 'BRuYcPA0S5C9cVmrMV96HZ98fyZUp9U_wTc9izk1YIk='
-
+ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
 
 class Account(db.Model):
     id = db.Column(GUID(), primary_key=True, default=uuid.uuid4)

@@ -1,11 +1,26 @@
+import stripe
 import random
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.extensions import db
+import logging
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.virtual_cards_model import VirtualCard
-from app.schema.virtual_cards_schema import VirtualCardSchema
 from app.models.account_model import Account
-from app.models.user_model import User  # Import the User model
+from app.models.user_model import User
+from app.schema.virtual_cards_schema import VirtualCardSchema
+from app.extensions import db
+from app.config.payment_config import PaymentConfig
+from app.services.payment_service import PaymentService
+from app.config.payment_config import PaymentConfig
+from decimal import Decimal
+
+# Initialize Stripe using configured secret key
+try:
+    if getattr(PaymentConfig, 'STRIPE_SECRET_KEY', None):
+        stripe.api_key = PaymentConfig.STRIPE_SECRET_KEY
+    else:
+        logging.warning("Stripe secret key not configured. Stripe operations will be skipped.")
+except Exception as _e:
+    logging.error(f"Failed to initialize Stripe: {_e}")
 
 card_bp = Blueprint("card", __name__)
 
@@ -72,6 +87,25 @@ def create_card():
         # Create a new card instance
         new_card = VirtualCard(**card_data)
 
+        # Optionally associate an existing Stripe PaymentMethod if provided by client
+        pm_id = data.get("stripe_payment_method_id")
+        if pm_id:
+            try:
+                if not getattr(stripe, 'api_key', None):
+                    raise ValueError("Stripe not configured")
+                pm = stripe.PaymentMethod.retrieve(pm_id)
+                if not pm or pm.get('type') != 'card':
+                    return jsonify({
+                        "status": 400,
+                        "message": "Provided payment method is invalid or not a card."
+                    }), 400
+                new_card.stripe_payment_method_id = pm_id
+            except stripe.error.StripeError as e:
+                return jsonify({
+                    "status": 400,
+                    "message": f"Failed to verify Stripe payment method: {str(e)}"
+                }), 400
+
         db.session.add(new_card)
         db.session.commit()
         
@@ -91,10 +125,14 @@ def create_card():
         
     except Exception as e:
         db.session.rollback()
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"Card creation error: {error_trace}")  # Debug output
         return jsonify({
             "status": 500,
             "message": "An error occurred while creating the card",
-            "error": str(e)
+            "error": str(e),
+            "trace": error_trace
         }), 500
 
 @card_bp.route("/card/<string:card_id>", methods=["GET"])
@@ -303,5 +341,41 @@ def delete_card(id):
         return jsonify({
             "status": 500,
             "message": "An error occurred while revealing the card number",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/card/<string:id>/change-pin", methods=["PUT"])
+@jwt_required()
+def change_pin(id):
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json() # gets current pin and new pin
+
+        card = VirtualCard.query.filter_by(id=id, user_id=user_id).first()
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+
+        if card.pin != data.get('current_pin'):
+            return jsonify({
+                "status": 401,
+                "message": "Invalid current PIN"
+            }), 401
+
+        card.pin = data.get('new_pin')
+        db.session.commit()
+
+        return jsonify({
+            "status": 200,
+            "message": "Card PIN changed successfully"
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while changing the card PIN",
             "error": str(e)
         }), 500

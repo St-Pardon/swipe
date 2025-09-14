@@ -1,5 +1,6 @@
 from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.utils.decorator import role_required
 from app.models.account_model import Account
 from app.models.user_model import User
 from app.schema.account_schema import AccountSchema, VALID_CURRENCY_CODES
@@ -290,3 +291,28 @@ def get_default_account_balance():
     except Exception as e:
         current_app.logger.error(f"Error in get_default_account_balance: {str(e)}")
         return jsonify({"status": 500, "message": "An error occurred while retrieving the balance."}), 500
+
+@account_bp.route("/account/close", methods=["POST"])
+@role_required("admin")
+def close_account():
+    try:
+        data = request.get_json()
+        user_id = get_jwt_identity()
+        account = Account.query.filter_by(user_id=user_id, id=data["account_id"]).first()
+        if not account:
+            return jsonify({
+                "status": 404,
+                "message": "Account not found"
+            }), 404
+        
+        db.session.delete(account)
+        db.session.commit()
+        
+        return jsonify({
+            "status": 200,
+            "message": "Account closed successfully"
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"Error in close_account: {str(e)}")
+        return jsonify({"status": 500, "message": "An error occurred while closing the account."}), 500
+    

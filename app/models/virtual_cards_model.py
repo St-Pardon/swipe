@@ -5,15 +5,16 @@ import hashlib
 from datetime import datetime, timedelta
 from app.config import Config
 from cryptography.fernet import Fernet
-from app.utils.generators import AccountNumberGenerator
+from app.utils.generators import CardNumberGenerator
 
-# Access config values safely
+# Access config values safely with proper error handling
 try:
-    secret_key = Config.SECRET_KEY
-    ACCOUNT_ENCRYPTION_KEY = Config.ACCOUNT_ENCRYPTION_KEY
-except AttributeError:
-    secret_key = 'dev-secret-key'
-    ACCOUNT_ENCRYPTION_KEY = 'BRuYcPA0S5C9cVmrMV96HZ98fyZUp9U_wTc9izk1YIk='
+    from app.config import Config
+    secret_key = getattr(Config, 'SECRET_KEY', '')
+    ACCOUNT_ENCRYPTION_KEY = getattr(Config, 'ACCOUNT_ENCRYPTION_KEY', '')
+except (ImportError, AttributeError) as e:
+    secret_key = ''
+    ACCOUNT_ENCRYPTION_KEY = ''
 
 class VirtualCard(db.Model):
     id = db.Column(GUID(), primary_key=True, default=uuid.uuid4)
@@ -37,19 +38,25 @@ class VirtualCard(db.Model):
     stripe_payment_method_id = db.Column(db.String(255), nullable=True)  # Stripe payment method ID
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     
-    _key_from_config = ACCOUNT_ENCRYPTION_KEY
-    if not _key_from_config:
-        _encryption_key = Fernet.generate_key()
-    else:
-        # Key from config should be a base64-encoded string
-        try:
-            _encryption_key = _key_from_config.encode('utf-8')
-            # Test if it's a valid Fernet key
-            Fernet(_encryption_key)
-        except Exception:
-            # If invalid, generate a new key
+    # Initialize encryption with safe fallbacks
+    try:
+        _key_from_config = ACCOUNT_ENCRYPTION_KEY
+        if not _key_from_config or _key_from_config == 'dev-encryption-key-change-in-production':
             _encryption_key = Fernet.generate_key()
-    _cipher_suite = Fernet(_encryption_key)
+        else:
+            # Key from config should be a base64-encoded string
+            try:
+                _encryption_key = _key_from_config.encode('utf-8')
+                # Test if it's a valid Fernet key
+                Fernet(_encryption_key)
+            except Exception:
+                # If invalid, generate a new key
+                _encryption_key = Fernet.generate_key()
+        _cipher_suite = Fernet(_encryption_key)
+    except Exception as e:
+        # Ultimate fallback - generate a new key
+        _encryption_key = Fernet.generate_key()
+        _cipher_suite = Fernet(_encryption_key)
     
     def __init__(self, **kwargs):
         super(VirtualCard, self).__init__(**kwargs)
@@ -110,7 +117,6 @@ class VirtualCard(db.Model):
     
     @staticmethod
     def generate_card_number(user_id):
-        """Generate a unique 16-digit card number."""
-        # Re-using AccountNumberGenerator logic for demonstration
-        # A dedicated card number generator (e.g., with BIN ranges) would be ideal in production.
-        return AccountNumberGenerator.generate_account_number(user_id, "5432")[:16]
+        """Generate a unique 16-digit card number (internal use only)."""
+        # Use dedicated card number generator (BIN + user-derived + random + Luhn)
+        return CardNumberGenerator.generate_card_number(user_id, bin_prefix="543200", length=16)
