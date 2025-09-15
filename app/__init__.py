@@ -9,8 +9,12 @@ from app.routes.account import account_bp
 from app.routes.auth import auth_bp
 from app.routes.users import user_bp
 from app.routes.card import card_bp
+from app.routes.card_payments import card_payments_bp
 from app.routes.payment import payment_bp
 from app.routes.transaction import transaction_bp
+from app.routes.wallet import wallet_bp
+from app.routes.webhooks import webhooks_bp
+# from app.routes.invoice_payments import invoice_payments_bp
 
 from app import models
 
@@ -30,7 +34,11 @@ def create_app():
     app.register_blueprint(account_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api")
     app.register_blueprint(card_bp, url_prefix="/api")
+    app.register_blueprint(card_payments_bp, url_prefix="/api")
     app.register_blueprint(payment_bp, url_prefix="/api")
     app.register_blueprint(transaction_bp, url_prefix="/api")
+    app.register_blueprint(wallet_bp, url_prefix="/api")
+    app.register_blueprint(webhooks_bp, url_prefix="/api")
+    # app.register_blueprint(invoice_payments_bp, url_prefix="/api")
 
     return app
