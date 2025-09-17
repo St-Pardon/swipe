@@ -8,6 +8,7 @@ from app.config.payment_config import PaymentConfig
 from app.extensions import db
 from decimal import Decimal
 import logging
+from app.routes.transaction import create_transaction
 
 wallet_bp = Blueprint('wallet', __name__)
 logger = logging.getLogger(__name__)
@@ -66,6 +67,24 @@ def fund_wallet():
             currency=currency,
             description=description
         )
+        # Log transaction as pending intent (credit to account on success)
+        try:
+            create_transaction(
+                user_id=user_id,
+                txn_type="wallet_fund_intent",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=description or f"Wallet funding intent {payment_intent.id}",
+                credit_account_id=account_id,
+                metadata={
+                    "payment_intent_id": str(payment_intent.id),
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Do not fail primary flow on logging failure
         
         return jsonify({
             "status": 201,
@@ -148,6 +167,26 @@ def withdraw_funds():
             currency=currency,
             method=method
         )
+        # Log payout transaction as pending (debit from account)
+        try:
+            create_transaction(
+                user_id=user_id,
+                txn_type="payout",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=f"Payout initiated to beneficiary {beneficiary_id}",
+                debit_account_id=account_id,
+                beneficiary_id=beneficiary_id,
+                metadata={
+                    "payout_id": str(payout.id),
+                    "method": method,
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Non-critical if logging fails
         
         return jsonify({
             "status": 201,

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.payment_service import PaymentService
 from app.models.payment_intent_model import PaymentIntent
 from app.models.virtual_cards_model import VirtualCard
@@ -9,6 +9,7 @@ from app.extensions import db
 from app.config.payment_config import PaymentConfig
 from decimal import Decimal
 import logging
+from app.routes.transaction import create_transaction
 
 card_payments_bp = Blueprint("card_payments", __name__)
 logger = logging.getLogger(__name__)
@@ -53,6 +54,26 @@ def fund_wallet_with_card(card_id):
             description=description
         )
         
+        # Log transaction as pending intent
+        try:
+            create_transaction(
+                user_id=user_id,
+                txn_type="card_wallet_fund_intent",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=description or f"Card wallet funding intent {payment_intent.id}",
+                credit_account_id=payment_intent.account_id if hasattr(payment_intent, 'account_id') else None,
+                metadata={
+                    "payment_intent_id": str(payment_intent.id),
+                    "virtual_card_id": card_id,
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Do not fail the main flow on logging failure
+
         # Serialize response
         schema = PaymentIntentSchema()
         result = schema.dump(payment_intent)

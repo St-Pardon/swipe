@@ -31,6 +31,6 @@ class TransactionSchema(SQLAlchemySchema):
     user = fields.Nested(User_schema(only=("id", "name", "email")), dump_only=True)
     debit_account = fields.Nested(AccountSchema(only=("id", "account_number_masked", "currency_code")), dump_only=True)
     credit_account = fields.Nested(AccountSchema(only=("id", "account_number_masked", "currency_code")), dump_only=True)
-    payment_method = fields.Nested("PaymentMethodSchema", only=("id", "type", "provider"), dump_only=True)
+    # payment_method = fields.Nested("PaymentMethodSchema", only=("id", "type", "provider"), dump_only=True)  # Removed
     beneficiary = fields.Nested("BeneficiariesSchema", only=("id", "beneficiary_name", "bank_name"), dump_only=True)
     

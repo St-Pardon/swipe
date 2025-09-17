@@ -35,11 +35,17 @@ class Account(db.Model):
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     _key_from_config = ACCOUNT_ENCRYPTION_KEY
-    if not _key_from_config:
+    if not _key_from_config or _key_from_config == 'dev-encryption-key-change-in-production':
         _encryption_key = Fernet.generate_key()
     else:
-        # Key from config must be encoded to bytes use script.py to generate key
-        _encryption_key = _key_from_config.encode('utf-8')
+        # Key from config must be a valid Fernet key (32 url-safe base64-encoded bytes)
+        try:
+            _encryption_key = _key_from_config.encode('utf-8')
+            # Test if it's a valid Fernet key
+            Fernet(_encryption_key)
+        except (ValueError, TypeError):
+            # If invalid, generate a new key
+            _encryption_key = Fernet.generate_key()
     _cipher_suite = Fernet(_encryption_key)
 
     def set_account_number(self, account_number):

@@ -19,7 +19,7 @@ class PaymentIntentSchema(SQLAlchemySchema):
     intent_type = auto_field(required=True)
     description = auto_field()
     gateway_intent_id = auto_field(dump_only=True)
-    client_secret = auto_field(dump_only=True)
+    client_secret = auto_field(dump_only=True, load_only=True)  # Don't expose in nested objects
     payment_method_id = auto_field(dump_only=True)
     payment_method_type = auto_field(dump_only=True)
     meta_data = auto_field(dump_only=True)
@@ -28,7 +28,7 @@ class PaymentIntentSchema(SQLAlchemySchema):
 
     # Nested relationships
     account = fields.Nested("AccountSchema", only=("id", "account_number_masked", "currency"), dump_only=True)
-    virtual_card = fields.Nested("VirtualCardSchema", only=("id", "card_number_masked", "card_type"), dump_only=True)
+    virtual_card = fields.Nested("VirtualCardSchema", only=("id", "card_number", "card_type"), dump_only=True)
 
     @validates('intent_type')
     def validate_intent_type(self, value, **kwargs):

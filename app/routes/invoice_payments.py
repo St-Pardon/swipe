@@ -7,6 +7,7 @@ from app.config.payment_config import PaymentConfig
 from app.extensions import db
 from decimal import Decimal
 import logging
+from app.routes.transaction import create_transaction
 
 invoice_payments_bp = Blueprint('invoice_payments', __name__)
 logger = logging.getLogger(__name__)
@@ -51,6 +52,24 @@ def create_invoice_payment_session(invoice_id):
             success_url=success_url,
             cancel_url=cancel_url
         )
+        # Log transaction as pending invoice payment intent
+        try:
+            create_transaction(
+                user_id=invoice.user_id,
+                txn_type="invoice_payment_intent",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=f"Invoice {invoice_id} payment intent",
+                metadata={
+                    "payment_intent_id": str(payment_intent.id),
+                    "invoice_id": invoice_id,
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Non-blocking if logging fails
         
         # Update invoice with payment session info
         if hasattr(invoice, 'payment_session_id'):
@@ -270,6 +289,24 @@ def get_invoice_payment_link(invoice_id):
             amount=amount,
             currency=currency
         )
+        # Log transaction for the new payment intent
+        try:
+            create_transaction(
+                user_id=user_id,
+                txn_type="invoice_payment_intent",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=f"Invoice {invoice_id} payment intent",
+                metadata={
+                    "payment_intent_id": str(payment_intent.id),
+                    "invoice_id": invoice_id,
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Non-blocking if logging fails
         
         # Update invoice with payment link
         if hasattr(invoice, 'payment_link'):

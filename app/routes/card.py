@@ -379,3 +379,227 @@ def change_pin(id):
             "message": "An error occurred while changing the card PIN",
             "error": str(e)
         }), 500
+
+@card_bp.route("/card/<string:card_id>/link-payment-method", methods=["POST"])
+@jwt_required()
+def link_payment_method(card_id):
+    """Link a Stripe payment method to an existing virtual card"""
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        if not data or not data.get('stripe_payment_method_id'):
+            return jsonify({
+                "status": 400,
+                "message": "stripe_payment_method_id is required"
+            }), 400
+        
+        # Verify card belongs to user
+        card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+        
+        stripe_payment_method_id = data.get('stripe_payment_method_id')
+        
+        # Verify the Stripe payment method exists and is valid
+        try:
+            if not getattr(stripe, 'api_key', None):
+                # For development without Stripe, allow linking mock payment methods
+                if not stripe_payment_method_id.startswith('pm_'):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid payment method ID format"
+                    }), 400
+                # Skip Stripe verification in development mode
+                logging.info(f"Development mode: Skipping Stripe verification for {stripe_payment_method_id}")
+            else:
+                try:
+                    pm = stripe.PaymentMethod.retrieve(stripe_payment_method_id)
+                    if not pm or pm.get('type') not in ['card', 'us_bank_account', 'sepa_debit', 'klarna', 'afterpay_clearpay']:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Payment method type not supported"
+                        }), 400
+                except (stripe.error.StripeError, ConnectionError, Exception) as stripe_err:
+                    # Handle network errors gracefully in development
+                    if "Failed to resolve" in str(stripe_err) or "ConnectionError" in str(stripe_err):
+                        logging.warning(f"Network error connecting to Stripe: {stripe_err}")
+                        logging.info(f"Development mode: Allowing payment method {stripe_payment_method_id} due to network issues")
+                        # Allow the operation to continue in development
+                        if not stripe_payment_method_id.startswith('pm_'):
+                            return jsonify({
+                                "status": 400,
+                                "message": "Invalid payment method ID format (network error, using basic validation)"
+                            }), 400
+                    else:
+                        return jsonify({
+                            "status": 400,
+                            "message": f"Failed to verify Stripe payment method: {str(stripe_err)}"
+                        }), 400
+        except Exception as e:
+            return jsonify({
+                "status": 400,
+                "message": f"Payment method validation error: {str(e)}"
+            }), 400
+        
+        # Link the payment method to the card
+        card.stripe_payment_method_id = stripe_payment_method_id
+        db.session.commit()
+        
+        card_schema = VirtualCardSchema()
+        result = card_schema.dump(card)
+        
+        return jsonify({
+            "status": 200,
+            "message": "Payment method linked successfully",
+            "data": result
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while linking payment method",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/payment-methods/available", methods=["GET"])
+@jwt_required()
+def get_available_payment_methods():
+    """Get available payment method types that can be linked to virtual cards"""
+    try:
+        # Define supported payment method types
+        payment_methods = [
+            {
+                "type": "card",
+                "name": "Credit/Debit Card",
+                "description": "Visa, Mastercard, American Express, and other card networks",
+                "supported_countries": ["US", "CA", "GB", "EU", "AU"],
+                "fees": "2.9% + 30¢ per transaction"
+            },
+            {
+                "type": "us_bank_account", 
+                "name": "US Bank Account (ACH)",
+                "description": "Direct bank account transfers via ACH",
+                "supported_countries": ["US"],
+                "fees": "0.8% per transaction (capped at $5)"
+            },
+            {
+                "type": "sepa_debit",
+                "name": "SEPA Direct Debit",
+                "description": "European bank account transfers",
+                "supported_countries": ["EU"],
+                "fees": "0.8% per transaction"
+            },
+            {
+                "type": "klarna",
+                "name": "Klarna",
+                "description": "Buy now, pay later with Klarna",
+                "supported_countries": ["US", "GB", "EU", "AU"],
+                "fees": "3.5% + 30¢ per transaction"
+            },
+            {
+                "type": "afterpay_clearpay",
+                "name": "Afterpay/Clearpay", 
+                "description": "Buy now, pay later in 4 installments",
+                "supported_countries": ["US", "GB", "AU"],
+                "fees": "4% + 30¢ per transaction"
+            }
+        ]
+        
+        return jsonify({
+            "status": 200,
+            "message": "Available payment methods retrieved successfully",
+            "data": {
+                "payment_methods": payment_methods,
+                "total_count": len(payment_methods)
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while retrieving payment methods",
+            "error": str(e)
+        }), 500
+
+@card_bp.route("/card/<string:card_id>/payment-method", methods=["GET"])
+@jwt_required()
+def get_card_payment_method(card_id):
+    """Get the linked payment method for a specific virtual card"""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Verify card belongs to user
+        card = VirtualCard.query.filter_by(id=card_id, user_id=user_id).first()
+        if not card:
+            return jsonify({
+                "status": 404,
+                "message": "Card not found"
+            }), 404
+        
+        if not card.stripe_payment_method_id:
+            return jsonify({
+                "status": 200,
+                "message": "No payment method linked to this card",
+                "data": {
+                    "card_id": card_id,
+                    "payment_method": None,
+                    "linked": False
+                }
+            }), 200
+        
+        # Get payment method details from Stripe (if configured)
+        payment_method_details = {
+            "id": card.stripe_payment_method_id,
+            "linked": True,
+            "type": "unknown"
+        }
+        
+        try:
+            if getattr(stripe, 'api_key', None):
+                pm = stripe.PaymentMethod.retrieve(card.stripe_payment_method_id)
+                payment_method_details.update({
+                    "type": pm.type,
+                    "created": pm.created,
+                    "customer": pm.customer
+                })
+                
+                # Add type-specific details
+                if pm.type == 'card' and pm.card:
+                    payment_method_details["card"] = {
+                        "brand": pm.card.brand,
+                        "last4": pm.card.last4,
+                        "exp_month": pm.card.exp_month,
+                        "exp_year": pm.card.exp_year,
+                        "funding": pm.card.funding
+                    }
+                elif pm.type == 'us_bank_account' and pm.us_bank_account:
+                    payment_method_details["bank_account"] = {
+                        "bank_name": pm.us_bank_account.bank_name,
+                        "last4": pm.us_bank_account.last4,
+                        "account_type": pm.us_bank_account.account_type
+                    }
+        except stripe.error.StripeError:
+            # If Stripe call fails, return basic info
+            pass
+        
+        return jsonify({
+            "status": 200,
+            "message": "Card payment method retrieved successfully",
+            "data": {
+                "card_id": card_id,
+                "payment_method": payment_method_details,
+                "linked": True
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while retrieving card payment method",
+            "error": str(e)
+        }), 500

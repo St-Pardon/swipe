@@ -9,8 +9,8 @@ class Transaction(db.Model):
     credit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=True)
     debit_account = db.relationship('Account', foreign_keys=[debit_account_id], back_populates='debit_transactions')
     credit_account = db.relationship('Account', foreign_keys=[credit_account_id], back_populates="credit_transactions")
-    payment_method_id = db.Column(GUID(), db.ForeignKey('payment_method.id'))
-    payment_method = db.relationship('PaymentMethod', back_populates='transactions')
+    payment_method_id = db.Column(GUID(), nullable=True)  # Removed PaymentMethod FK
+    # payment_method = db.relationship('PaymentMethod', back_populates='transactions')  # Removed
     beneficiary_id = db.Column(GUID(), db.ForeignKey('beneficiaries.id'), nullable=True)
     beneficiary = db.relationship('Beneficiaries', back_populates='transactions')
     # invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=True)

@@ -10,7 +10,24 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
     # Database configuration
+    def _normalize_db_url(url: str) -> str:
+        """Normalize DATABASE_URL for SQLAlchemy.
+        - Map deprecated "postgres://" to "postgresql://"
+        - Prefer psycopg3 by forcing dialect "postgresql+psycopg://" when no driver specified
+        """
+        if not url:
+            return 'sqlite:///swipe.db'
+        # Replace deprecated scheme
+        if url.startswith('postgres://'):
+            url = 'postgresql://' + url[len('postgres://'):]
+        # If postgresql URL without explicit driver, force psycopg3
+        if url.startswith('postgresql://') and '+psycopg' not in url and '+psycopg2' not in url:
+            url = 'postgresql+psycopg://' + url[len('postgresql://'):]
+        return url
+
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///swipe.db'
+
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///swipe.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT configuration

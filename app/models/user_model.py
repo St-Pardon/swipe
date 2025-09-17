@@ -24,7 +24,7 @@ class User(db.Model):
     beneficiaries = db.relationship('Beneficiaries', back_populates='user', cascade="all, delete-orphan")
     payment_intents = db.relationship('PaymentIntent', back_populates='user', cascade="all, delete-orphan")
     payouts = db.relationship('Payout', back_populates='user', cascade="all, delete-orphan")
-    payment_methods = db.relationship('PaymentMethod', back_populates='user', cascade="all, delete-orphan")
+    # payment_methods = db.relationship('PaymentMethod', back_populates='user', cascade="all, delete-orphan")  # Removed
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):
