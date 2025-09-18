@@ -80,12 +80,17 @@ def update_user():
                 "message": "User not found"
             })
         
-        user_schema = User_schema()
-        updated_user = user_schema.load(data, instance=user, partial=True)
+        # Update user fields directly without schema post_load
+        for key, value in data.items():
+            if hasattr(user, key) and key != 'password':
+                setattr(user, key, value)
+            elif key == 'password':
+                user.set_password(value)
 
         db.session.commit()
 
-        result = user_schema.dump(updated_user)
+        user_schema = User_schema()
+        result = user_schema.dump(user)
         return jsonify({
             "status": 200,
             "message": "User updated successfully",

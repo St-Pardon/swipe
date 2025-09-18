@@ -215,6 +215,57 @@ class PaymentService:
             raise
     
     @staticmethod
+    def create_withdrawal(user_id, source_account_id, target_account_number, amount, currency, method='standard'):
+        """
+        Create a withdrawal to an external bank account (user's own account)
+        """
+        try:
+            from app.models.account_model import Account
+            from app.models.payout_model import Payout
+            
+            # Verify source account belongs to user and has sufficient balance
+            source_account = Account.query.filter_by(id=source_account_id, user_id=user_id).first()
+            if not source_account:
+                raise ValueError("Source account not found or doesn't belong to user")
+            
+            if source_account.balance < amount:
+                raise ValueError("Insufficient balance for withdrawal")
+            
+            # For now, create a mock withdrawal (in production, you'd integrate with bank APIs)
+            import time
+            timestamp = int(time.time() * 1000)  # milliseconds for uniqueness
+            mock_withdrawal_id = f"wd_mock_{user_id}_{source_account_id}_{timestamp}"
+            
+            # Create local withdrawal record
+            withdrawal = Payout.create_bank_payout(
+                user_id=user_id,
+                account_id=source_account_id,
+                beneficiary_id=None,  # No beneficiary for direct withdrawals
+                amount=amount,
+                currency=currency.upper()
+            )
+            
+            withdrawal.gateway_payout_id = mock_withdrawal_id
+            withdrawal.method = method
+            withdrawal.status = 'pending'
+            withdrawal.description = f'Withdrawal of {amount} {currency} to bank account {target_account_number}'
+            
+            # Deduct amount from source account balance
+            source_account.balance -= float(amount)  # Convert Decimal to float
+            
+            db.session.add(withdrawal)
+            db.session.commit()
+            
+            logger.info(f"Created withdrawal {mock_withdrawal_id} for user {user_id}")
+            
+            return withdrawal
+            
+        except Exception as e:
+            logger.error(f"Error creating withdrawal: {str(e)}")
+            db.session.rollback()
+            raise e
+
+    @staticmethod
     def create_payout(user_id, account_id, beneficiary_id, amount, currency, method='standard'):
         """
         Create a Stripe payout for withdrawal
@@ -246,7 +297,9 @@ class PaymentService:
             
             # For now, create a mock payout (in production, you'd need to set up Stripe Connect)
             # This would require the beneficiary to have a connected Stripe account
-            mock_payout_id = f"po_mock_{user_id}_{account_id}"
+            import time
+            timestamp = int(time.time() * 1000)  # milliseconds for uniqueness
+            mock_payout_id = f"po_mock_{user_id}_{account_id}_{timestamp}"
             
             # Create local payout record
             payout = Payout.create_bank_payout(
@@ -274,7 +327,190 @@ class PaymentService:
         except Exception as e:
             logger.error(f"Error creating payout: {str(e)}")
             db.session.rollback()
-            raise
+            raise e
+
+    @staticmethod
+    def create_beneficiary_transfer(user_id, source_account_id, beneficiary_id, amount, currency, description=''):
+        """Transfer funds to a beneficiary account"""
+        try:
+            from app.models.account_model import Account
+            from app.models.beneficiaries_model import Beneficiaries
+            from app.models.payout_model import Payout
+            
+            # Verify source account and beneficiary
+            source_account = Account.query.filter_by(id=source_account_id, user_id=user_id).first()
+            if not source_account:
+                raise ValueError("Source account not found or doesn't belong to user")
+            
+            beneficiary = Beneficiaries.query.filter_by(id=beneficiary_id, user_id=user_id).first()
+            if not beneficiary:
+                raise ValueError("Beneficiary not found or doesn't belong to user")
+            
+            if source_account.balance < amount:
+                raise ValueError("Insufficient balance for transfer")
+            
+            # Create transfer record using existing payout infrastructure
+            return PaymentService.create_payout(user_id, source_account_id, beneficiary_id, amount, currency)
+            
+        except Exception as e:
+            logger.error(f"Error creating beneficiary transfer: {str(e)}")
+            raise e
+
+    @staticmethod
+    def create_internal_transfer(user_id, source_account_id, target_account_id, amount, currency, description=''):
+        """Transfer funds between user's own accounts"""
+        try:
+            from app.models.account_model import Account
+            from app.models.transactions_model import Transaction
+            
+            # Verify both accounts belong to user
+            source_account = Account.query.filter_by(id=source_account_id, user_id=user_id).first()
+            target_account = Account.query.filter_by(id=target_account_id, user_id=user_id).first()
+            
+            if not source_account:
+                raise ValueError("Source account not found or doesn't belong to user")
+            if not target_account:
+                raise ValueError("Target account not found or doesn't belong to user")
+            
+            if source_account.balance < amount:
+                raise ValueError("Insufficient balance for transfer")
+            
+            # Perform internal transfer (immediate)
+            source_account.balance -= float(amount)
+            target_account.balance += float(amount)
+            
+            # Create transaction record
+            import time
+            timestamp = int(time.time() * 1000)
+            mock_transfer_id = f"tr_internal_{user_id}_{timestamp}"
+            
+            # Create a mock transfer object with required attributes
+            class MockTransfer:
+                def __init__(self, transfer_id, amount, currency, status='completed'):
+                    self.id = transfer_id
+                    self.amount = amount
+                    self.currency = currency
+                    self.status = status
+                    self.gateway_payout_id = mock_transfer_id
+            
+            transfer = MockTransfer(mock_transfer_id, amount, currency)
+            
+            db.session.commit()
+            logger.info(f"Created internal transfer {mock_transfer_id} for user {user_id}")
+            
+            return transfer
+            
+        except Exception as e:
+            logger.error(f"Error creating internal transfer: {str(e)}")
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def create_customer_transfer(user_id, source_account_id, target_user_email=None, target_account_number=None, amount=None, currency=None, description=''):
+        """Transfer funds to another customer's account"""
+        try:
+            from app.models.account_model import Account
+            from app.models.user_model import User
+            
+            # Verify source account
+            source_account = Account.query.filter_by(id=source_account_id, user_id=user_id).first()
+            if not source_account:
+                raise ValueError("Source account not found or doesn't belong to user")
+            
+            if source_account.balance < amount:
+                raise ValueError("Insufficient balance for transfer")
+            
+            # Find target user and account
+            target_account = None
+            if target_user_email:
+                target_user = User.query.filter_by(email=target_user_email).first()
+                if not target_user:
+                    raise ValueError(f"No customer found with email: {target_user_email}")
+                target_account = Account.query.filter_by(user_id=target_user.id, currency_code=currency, is_default=True).first()
+            elif target_account_number:
+                # Search through all accounts to find matching account number
+                all_accounts = Account.query.filter_by(currency_code=currency).all()
+                for account in all_accounts:
+                    if account.get_account_number() == target_account_number:
+                        target_account = account
+                        break
+            
+            if not target_account:
+                raise ValueError("Target customer account not found")
+            
+            # Perform customer transfer (immediate)
+            source_account.balance -= float(amount)
+            target_account.balance += float(amount)
+            
+            import time
+            timestamp = int(time.time() * 1000)
+            mock_transfer_id = f"tr_customer_{user_id}_{timestamp}"
+            
+            class MockTransfer:
+                def __init__(self, transfer_id, amount, currency, status='completed'):
+                    self.id = transfer_id
+                    self.amount = amount
+                    self.currency = currency
+                    self.status = status
+                    self.gateway_payout_id = mock_transfer_id
+            
+            transfer = MockTransfer(mock_transfer_id, amount, currency)
+            
+            db.session.commit()
+            logger.info(f"Created customer transfer {mock_transfer_id} for user {user_id}")
+            
+            return transfer
+            
+        except Exception as e:
+            logger.error(f"Error creating customer transfer: {str(e)}")
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def create_external_transfer(user_id, source_account_id, target_account_number, target_routing_number, target_bank_name, target_account_holder, amount, currency, description=''):
+        """Transfer funds to external account (non-customer)"""
+        try:
+            from app.models.account_model import Account
+            
+            # Verify source account
+            source_account = Account.query.filter_by(id=source_account_id, user_id=user_id).first()
+            if not source_account:
+                raise ValueError("Source account not found or doesn't belong to user")
+            
+            if source_account.balance < amount:
+                raise ValueError("Insufficient balance for transfer")
+            
+            # For external transfers, we'd typically integrate with ACH/wire services
+            # For now, create a mock external transfer
+            source_account.balance -= float(amount)
+            
+            import time
+            timestamp = int(time.time() * 1000)
+            mock_transfer_id = f"tr_external_{user_id}_{timestamp}"
+            
+            class MockTransfer:
+                def __init__(self, transfer_id, amount, currency, status='pending'):
+                    self.id = transfer_id
+                    self.amount = amount
+                    self.currency = currency
+                    self.status = status
+                    self.gateway_payout_id = mock_transfer_id
+                
+                def get_estimated_arrival(self):
+                    from datetime import datetime, timedelta
+                    return datetime.now() + timedelta(days=2)
+            
+            transfer = MockTransfer(mock_transfer_id, amount, currency)
+            
+            db.session.commit()
+            logger.info(f"Created external transfer {mock_transfer_id} for user {user_id}")
+            
+            return transfer
+            
+        except Exception as e:
+            logger.error(f"Error creating external transfer: {str(e)}")
+            db.session.rollback()
+            raise e
     
     @staticmethod
     def confirm_payment_intent(payment_intent_id, payment_method_id=None):

@@ -14,7 +14,7 @@ class User_schema(SQLAlchemySchema):
 
     id = auto_field(dump_only=True)
     email = auto_field()
-    password = fields.String(load_only=True, required=True)
+    password = fields.String(load_only=True, required=False)
     name = auto_field()
     accountType = auto_field(validate=validate.OneOf(['freelancer', 'company']))
     country = auto_field()
@@ -29,7 +29,19 @@ class User_schema(SQLAlchemySchema):
         """
         Creates a User instance and hashes the password.
         """
-        password = data.pop('password')
-        user = User(**data)
-        user.set_password(password)
-        return user
+        password = data.pop('password', None)
+        if kwargs.get('instance'):
+            # Updating existing user
+            user = kwargs['instance']
+            for key, value in data.items():
+                setattr(user, key, value)
+            if password:
+                user.set_password(password)
+            return user
+        else:
+            # Creating new user
+            if not password:
+                raise ValueError("Password is required for new users")
+            user = User(**data)
+            user.set_password(password)
+            return user

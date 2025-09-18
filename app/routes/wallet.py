@@ -121,7 +121,7 @@ def withdraw_funds():
         user_id = get_jwt_identity()
         
         # Validate required fields
-        required_fields = ['amount', 'currency', 'beneficiary_id']
+        required_fields = ['amount', 'currency']
         for field in required_fields:
             if field not in data:
                 return jsonify({
@@ -129,11 +129,33 @@ def withdraw_funds():
                     "message": f"Missing required field: {field}"
                 }), 400
         
+        # account_number is required for withdrawal (external bank account)
+        account_number = data.get('account_number')
+        
+        if not account_number:
+            return jsonify({
+                "status": 400,
+                "message": "account_number is required for withdrawal"
+            }), 400
+        
         amount = Decimal(str(data['amount']))
         currency = data['currency'].upper()
-        beneficiary_id = data['beneficiary_id']
         account_id = data.get('account_id')
         method = data.get('method', 'standard')  # standard or instant
+        
+        # Validate that the account_number exists and belongs to user
+        from app.models.account_model import Account
+        target_account = None
+        for account in Account.query.filter_by(user_id=user_id).all():
+            if account.get_account_number() == account_number:
+                target_account = account
+                break
+        
+        if not target_account:
+            return jsonify({
+                "status": 404,
+                "message": f"No account found with account number: {account_number}"
+            }), 404
         
         # If no account_id provided, use default account
         if not account_id:
@@ -158,11 +180,11 @@ def withdraw_funds():
                 "message": f"Currency {currency} is not supported for payouts"
             }), 400
         
-        # Create payout using PaymentService
-        payout = PaymentService.create_payout(
+        # Create payout using PaymentService (withdrawal to external bank)
+        payout = PaymentService.create_withdrawal(
             user_id=user_id,
-            account_id=account_id,
-            beneficiary_id=beneficiary_id,
+            source_account_id=account_id,
+            target_account_number=account_number,
             amount=amount,
             currency=currency,
             method=method
@@ -175,9 +197,8 @@ def withdraw_funds():
                 status="pending",
                 amount=amount,
                 currency_code=currency,
-                description=f"Payout initiated to beneficiary {beneficiary_id}",
+                description=f"Withdrawal to account {account_number}",
                 debit_account_id=account_id,
-                beneficiary_id=beneficiary_id,
                 metadata={
                     "payout_id": str(payout.id),
                     "method": method,
@@ -209,6 +230,191 @@ def withdraw_funds():
         }), 400
     except Exception as e:
         logger.error(f"Error creating payout: {str(e)}")
+        return jsonify({
+            "status": 500,
+            "message": "An error occurred while processing your request"
+        }), 500
+
+@wallet_bp.route("/wallets/transfer", methods=["POST"])
+@jwt_required()
+def transfer_funds():
+    """
+    Transfer funds between accounts (beneficiaries, second accounts, other customers, non-customers)
+    """
+    try:
+        data = request.get_json()
+        user_id = get_jwt_identity()
+        
+        # Validate required fields
+        required_fields = ['amount', 'currency', 'transfer_type']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    "status": 400,
+                    "message": f"Missing required field: {field}"
+                }), 400
+        
+        amount = Decimal(str(data['amount']))
+        currency = data['currency'].upper()
+        transfer_type = data['transfer_type']  # 'beneficiary', 'internal', 'customer', 'external'
+        source_account_id = data.get('source_account_id')
+        description = data.get('description', '')
+        
+        # If no source_account_id provided, use default account
+        if not source_account_id:
+            default_account = Account.query.filter_by(
+                user_id=user_id, 
+                is_default=True,
+                currency_code=currency
+            ).first()
+            
+            if not default_account:
+                return jsonify({
+                    "status": 404,
+                    "message": f"No default {currency} account found. Please specify source_account_id."
+                }), 404
+            
+            source_account_id = default_account.id
+        
+        # Validate currency support
+        if not PaymentConfig.is_payout_currency_supported(currency):
+            return jsonify({
+                "status": 400,
+                "message": f"Currency {currency} is not supported for transfers"
+            }), 400
+        
+        # Handle different transfer types
+        if transfer_type == 'beneficiary':
+            # Transfer to beneficiary account
+            beneficiary_id = data.get('beneficiary_id')
+            if not beneficiary_id:
+                return jsonify({
+                    "status": 400,
+                    "message": "beneficiary_id is required for beneficiary transfers"
+                }), 400
+            
+            transfer = PaymentService.create_beneficiary_transfer(
+                user_id=user_id,
+                source_account_id=source_account_id,
+                beneficiary_id=beneficiary_id,
+                amount=amount,
+                currency=currency,
+                description=description
+            )
+            
+        elif transfer_type == 'internal':
+            # Transfer to another account owned by the same user
+            target_account_id = data.get('target_account_id')
+            if not target_account_id:
+                return jsonify({
+                    "status": 400,
+                    "message": "target_account_id is required for internal transfers"
+                }), 400
+            
+            transfer = PaymentService.create_internal_transfer(
+                user_id=user_id,
+                source_account_id=source_account_id,
+                target_account_id=target_account_id,
+                amount=amount,
+                currency=currency,
+                description=description
+            )
+            
+        elif transfer_type == 'customer':
+            # Transfer to another customer's account
+            target_user_email = data.get('target_user_email')
+            target_account_number = data.get('target_account_number')
+            
+            if not target_user_email and not target_account_number:
+                return jsonify({
+                    "status": 400,
+                    "message": "Either target_user_email or target_account_number is required for customer transfers"
+                }), 400
+            
+            transfer = PaymentService.create_customer_transfer(
+                user_id=user_id,
+                source_account_id=source_account_id,
+                target_user_email=target_user_email,
+                target_account_number=target_account_number,
+                amount=amount,
+                currency=currency,
+                description=description
+            )
+            
+        elif transfer_type == 'external':
+            # Transfer to external account (non-customer)
+            target_account_number = data.get('target_account_number')
+            target_routing_number = data.get('target_routing_number')
+            target_bank_name = data.get('target_bank_name')
+            target_account_holder = data.get('target_account_holder')
+            
+            required_external_fields = ['target_account_number', 'target_routing_number', 'target_bank_name', 'target_account_holder']
+            for field in required_external_fields:
+                if field not in data:
+                    return jsonify({
+                        "status": 400,
+                        "message": f"Missing required field for external transfer: {field}"
+                    }), 400
+            
+            transfer = PaymentService.create_external_transfer(
+                user_id=user_id,
+                source_account_id=source_account_id,
+                target_account_number=target_account_number,
+                target_routing_number=target_routing_number,
+                target_bank_name=target_bank_name,
+                target_account_holder=target_account_holder,
+                amount=amount,
+                currency=currency,
+                description=description
+            )
+            
+        else:
+            return jsonify({
+                "status": 400,
+                "message": "Invalid transfer_type. Must be one of: beneficiary, internal, customer, external"
+            }), 400
+        
+        # Log transfer transaction
+        try:
+            create_transaction(
+                user_id=user_id,
+                txn_type="transfer",
+                status="pending",
+                amount=amount,
+                currency_code=currency,
+                description=description or f"Transfer ({transfer_type})",
+                debit_account_id=source_account_id,
+                metadata={
+                    "transfer_id": str(transfer.id),
+                    "transfer_type": transfer_type,
+                },
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Non-critical if logging fails
+        
+        return jsonify({
+            "status": 201,
+            "message": "Transfer initiated successfully",
+            "data": {
+                "transfer_id": transfer.id,
+                "gateway_transfer_id": getattr(transfer, 'gateway_payout_id', None),
+                "amount": str(transfer.amount),
+                "currency": transfer.currency,
+                "status": transfer.status,
+                "transfer_type": transfer_type,
+                "estimated_arrival": transfer.get_estimated_arrival().isoformat() if hasattr(transfer, 'get_estimated_arrival') else None
+            }
+        }), 201
+        
+    except ValueError as e:
+        return jsonify({
+            "status": 400,
+            "message": str(e)
+        }), 400
+    except Exception as e:
+        logger.error(f"Error creating transfer: {str(e)}")
         return jsonify({
             "status": 500,
             "message": "An error occurred while processing your request"

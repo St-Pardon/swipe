@@ -1,9 +1,10 @@
 from app.extensions import db
 from app.utils.guid_utils import GUID
 from datetime import datetime
+import uuid
 
 class Beneficiaries(db.Model):
-    id = db.Column(GUID(), primary_key=True, default=GUID())
+    id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='beneficiaries')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)

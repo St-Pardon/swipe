@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from app.config import Config
 from app.extensions import db, migrate
+from app.swagger import swagger_bp
 
 # import Blueprint
 from app.routes.base_route import base_bp
@@ -30,6 +31,7 @@ def create_app():
 
     # Register Blueprint
     app.register_blueprint(base_bp)
+    app.register_blueprint(swagger_bp)  # Swagger UI
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(account_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api")
