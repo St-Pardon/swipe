@@ -11,7 +11,10 @@ webhooks_bp = Blueprint('webhooks', __name__)
 logger = logging.getLogger(__name__)
 
 # Configure Stripe
-stripe.api_key = PaymentConfig.STRIPE_SECRET_KEY
+if PaymentConfig.STRIPE_SECRET_KEY:
+    stripe.api_key = PaymentConfig.STRIPE_SECRET_KEY
+else:
+    stripe.api_key = None
 
 @webhooks_bp.route('/webhooks/stripe', methods=['POST'])
 def handle_stripe_webhook():

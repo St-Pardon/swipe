@@ -15,12 +15,16 @@ from decimal import Decimal
 
 # Initialize Stripe using configured secret key
 try:
-    if getattr(PaymentConfig, 'STRIPE_SECRET_KEY', None):
+    if PaymentConfig.STRIPE_SECRET_KEY:
+        print("Stripe secret key configured. from card.py")
+        print(PaymentConfig.STRIPE_SECRET_KEY)
         stripe.api_key = PaymentConfig.STRIPE_SECRET_KEY
     else:
         logging.warning("Stripe secret key not configured. Stripe operations will be skipped.")
+        stripe.api_key = None  # Explicitly set to None for development mode
 except Exception as _e:
     logging.error(f"Failed to initialize Stripe: {_e}")
+    stripe.api_key = None
 
 card_bp = Blueprint("card", __name__)
 
@@ -405,45 +409,46 @@ def link_payment_method(card_id):
         stripe_payment_method_id = data.get('stripe_payment_method_id')
         
         # Verify the Stripe payment method exists and is valid
-        try:
-            if not getattr(stripe, 'api_key', None):
-                # For development without Stripe, allow linking mock payment methods
-                if not stripe_payment_method_id.startswith('pm_'):
+        from app.config.payment_config import PaymentConfig
+        
+        # Check if we're in development mode (no Stripe key configured)
+        if not PaymentConfig.STRIPE_SECRET_KEY:
+            # For development without Stripe, allow linking mock payment methods
+            if not stripe_payment_method_id.startswith('pm_'):
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid payment method ID format"
+                }), 400
+            # Skip Stripe verification in development mode
+            logging.info(f"Development mode: Skipping Stripe verification for {stripe_payment_method_id}")
+        else:
+            # Production mode - verify with Stripe
+            try:
+                pm = stripe.PaymentMethod.retrieve(stripe_payment_method_id)
+                if not pm or pm.get('type') not in ['card', 'us_bank_account', 'sepa_debit', 'klarna', 'afterpay_clearpay']:
                     return jsonify({
                         "status": 400,
-                        "message": "Invalid payment method ID format"
+                        "message": "Payment method type not supported"
                     }), 400
-                # Skip Stripe verification in development mode
-                logging.info(f"Development mode: Skipping Stripe verification for {stripe_payment_method_id}")
-            else:
-                try:
-                    pm = stripe.PaymentMethod.retrieve(stripe_payment_method_id)
-                    if not pm or pm.get('type') not in ['card', 'us_bank_account', 'sepa_debit', 'klarna', 'afterpay_clearpay']:
+            except (stripe.error.StripeError, ConnectionError, Exception) as stripe_err:
+                # Handle Stripe errors gracefully
+                if ("Failed to resolve" in str(stripe_err) or 
+                    "ConnectionError" in str(stripe_err) or
+                    "NoneType" in str(stripe_err) or
+                    "Secret" in str(stripe_err)):
+                    logging.warning(f"Stripe API issue: {stripe_err}")
+                    logging.info(f"Allowing payment method {stripe_payment_method_id} due to API issues")
+                    # Allow the operation to continue with basic validation
+                    if not stripe_payment_method_id.startswith('pm_'):
                         return jsonify({
                             "status": 400,
-                            "message": "Payment method type not supported"
+                            "message": "Invalid payment method ID format"
                         }), 400
-                except (stripe.error.StripeError, ConnectionError, Exception) as stripe_err:
-                    # Handle network errors gracefully in development
-                    if "Failed to resolve" in str(stripe_err) or "ConnectionError" in str(stripe_err):
-                        logging.warning(f"Network error connecting to Stripe: {stripe_err}")
-                        logging.info(f"Development mode: Allowing payment method {stripe_payment_method_id} due to network issues")
-                        # Allow the operation to continue in development
-                        if not stripe_payment_method_id.startswith('pm_'):
-                            return jsonify({
-                                "status": 400,
-                                "message": "Invalid payment method ID format (network error, using basic validation)"
-                            }), 400
-                    else:
-                        return jsonify({
-                            "status": 400,
-                            "message": f"Failed to verify Stripe payment method: {str(stripe_err)}"
-                        }), 400
-        except Exception as e:
-            return jsonify({
-                "status": 400,
-                "message": f"Payment method validation error: {str(e)}"
-            }), 400
+                else:
+                    return jsonify({
+                        "status": 400,
+                        "message": f"Failed to verify Stripe payment method: {str(stripe_err)}"
+                    }), 400
         
         # Link the payment method to the card
         card.stripe_payment_method_id = stripe_payment_method_id

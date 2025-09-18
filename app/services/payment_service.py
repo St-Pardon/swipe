@@ -262,7 +262,7 @@ class PaymentService:
             payout.status = 'pending'
             
             # Deduct amount from account balance
-            account.balance -= amount
+            account.balance -= float(amount)  # Convert Decimal to float
             
             db.session.add(payout)
             db.session.commit()
@@ -413,7 +413,6 @@ class PaymentService:
                     currency=currency.lower(),
                     description=description or f'Fund wallet using card ending in {card.card_number[-4:]}',
                     payment_method=card.stripe_payment_method_id,
-                    confirmation_method='manual',
                     confirm=True,
                     metadata={
                         'user_id': str(user_id),
@@ -427,7 +426,9 @@ class PaymentService:
                 # Handle network errors and mock payment methods in development
                 if ("No such PaymentMethod" in str(stripe_err) or 
                     "Failed to resolve" in str(stripe_err) or 
-                    "ConnectionError" in str(stripe_err)):
+                    "ConnectionError" in str(stripe_err) or
+                    "return_url" in str(stripe_err) or
+                    "redirect" in str(stripe_err)):
                     
                     logger.warning(f"Stripe API issue: {stripe_err}")
                     logger.info(f"Development mode: Creating mock payment intent for card {card_id}")

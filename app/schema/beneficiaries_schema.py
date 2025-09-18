@@ -12,7 +12,7 @@ class BeneficiariesSchema(SQLAlchemySchema):
         sqla_session = db.session
 
     id = auto_field(dump_only=True)
-    user_id = auto_field(load_only=True, required=True)
+    user_id = auto_field(load_only=True, required=False)
     account_id = auto_field(load_only=True, required=True)
     bank_name = auto_field(required=True)
     account_number = auto_field(required=True)

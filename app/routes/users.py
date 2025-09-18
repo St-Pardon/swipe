@@ -154,12 +154,17 @@ def create_benefitiary(id):
         data = request.get_json()
         user_id = get_jwt_identity()
         beneficiary_schema = BeneficiariesSchema()
+        
+        # Remove user_id from data if present to avoid duplicate parameter
+        data.pop('user_id', None)
+        
         errors = beneficiary_schema.validate(data)
 
         if errors:
-            return jsonify({"status": 400, "message": "Invalid data", "errors": errors}),
+            return jsonify({"status": 400, "message": "Invalid data", "errors": errors}), 400
 
         beneficiary = Beneficiaries.create_beneficiary(user_id=user_id, **data)
+        db.session.add(beneficiary)
         db.session.commit()
 
         result = beneficiary_schema.dump(beneficiary)
@@ -174,7 +179,7 @@ def create_benefitiary(id):
             "status": 400, 
             "message": "Validation error", 
             "errors": ve.messages
-            }), 40
+            }), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({

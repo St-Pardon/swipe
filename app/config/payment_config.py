@@ -9,6 +9,13 @@ class PaymentConfig:
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
     STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
+    # Stripe Configuration - use actual test keys for development
+    STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+    STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+    STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    print(STRIPE_PUBLISHABLE_KEY)
+    print(STRIPE_SECRET_KEY)
+    print(STRIPE_WEBHOOK_SECRET)
     # Application URLs
     FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
     WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'http://localhost:5000')
