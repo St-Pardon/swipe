@@ -1,8 +1,8 @@
-"""updated migration
+"""initial migration with all current models
 
-Revision ID: 7489757f44b3
+Revision ID: 185081d296a9
 Revises: 
-Create Date: 2025-09-12 16:20:01.481981
+Create Date: 2025-09-17 14:35:22.571176
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ from app.utils.guid_utils import GUID
 
 
 # revision identifiers, used by Alembic.
-revision = '7489757f44b3'
+revision = '185081d296a9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,11 +25,11 @@ def upgrade():
     sa.Column('password', sa.String(length=128), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('accountType', sa.String(length=120), nullable=False),
-    sa.Column('country', sa.String(length=120), nullable=False),
-    sa.Column('countryCode', sa.String(length=120), nullable=False),
-    sa.Column('city', sa.String(length=120), nullable=False),
+    sa.Column('country', sa.String(length=120), nullable=True),
+    sa.Column('countryCode', sa.String(length=120), nullable=True),
+    sa.Column('city', sa.String(length=120), nullable=True),
     sa.Column('role', sa.String(length=120), nullable=False),
-    sa.Column('address', sa.String(length=120), nullable=False),
+    sa.Column('address', sa.String(length=120), nullable=True),
     sa.Column('phone', sa.String(length=120), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
@@ -56,19 +56,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('account_number_hash')
     )
-    op.create_table('payment_method',
-    sa.Column('id', GUID(), nullable=False),
-    sa.Column('user_id', GUID(), nullable=False),
-    sa.Column('type', sa.String(length=50), nullable=False),
-    sa.Column('provider', sa.String(length=50), nullable=True),
-    sa.Column('external_id', sa.String(length=255), nullable=True),
-    sa.Column('details', sa.JSON(), nullable=True),
-    sa.Column('is_default', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('beneficiaries',
     sa.Column('id', GUID(), nullable=False),
     sa.Column('user_id', GUID(), nullable=False),
@@ -81,28 +68,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('payment_intents',
-    sa.Column('id', GUID(), nullable=False),
-    sa.Column('user_id', GUID(), nullable=False),
-    sa.Column('gateway_intent_id', sa.String(length=255), nullable=False),
-    sa.Column('client_secret', sa.String(length=255), nullable=True),
-    sa.Column('amount', sa.Numeric(precision=15, scale=2), nullable=False),
-    sa.Column('currency', sa.String(length=3), nullable=False),
-    sa.Column('status', sa.String(length=50), nullable=False),
-    sa.Column('intent_type', sa.String(length=50), nullable=False),
-    sa.Column('account_id', GUID(), nullable=True),
-    sa.Column('meta_data', sa.Text(), nullable=True),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('payment_method_id', sa.String(length=255), nullable=True),
-    sa.Column('payment_method_type', sa.String(length=50), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
-    sa.Column('confirmed_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('gateway_intent_id')
     )
     op.create_table('virtual_card',
     sa.Column('id', GUID(), nullable=False),
@@ -119,11 +84,36 @@ def upgrade():
     sa.Column('spending_limit', sa.Float(), nullable=True),
     sa.Column('is_default', sa.Boolean(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('stripe_payment_method_id', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('card_number_hash')
+    )
+    op.create_table('payment_intents',
+    sa.Column('id', GUID(), nullable=False),
+    sa.Column('user_id', GUID(), nullable=False),
+    sa.Column('gateway_intent_id', sa.String(length=255), nullable=False),
+    sa.Column('client_secret', sa.String(length=255), nullable=True),
+    sa.Column('amount', sa.Numeric(precision=15, scale=2), nullable=False),
+    sa.Column('currency', sa.String(length=3), nullable=False),
+    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('intent_type', sa.String(length=50), nullable=False),
+    sa.Column('account_id', GUID(), nullable=True),
+    sa.Column('virtual_card_id', GUID(), nullable=True),
+    sa.Column('meta_data', sa.Text(), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('payment_method_id', sa.String(length=255), nullable=True),
+    sa.Column('payment_method_type', sa.String(length=50), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('confirmed_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['virtual_card_id'], ['virtual_card.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('gateway_intent_id')
     )
     op.create_table('payouts',
     sa.Column('id', GUID(), nullable=False),
@@ -169,7 +159,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['beneficiary_id'], ['beneficiaries.id'], ),
     sa.ForeignKeyConstraint(['credit_account_id'], ['account.id'], ),
     sa.ForeignKeyConstraint(['debit_account_id'], ['account.id'], ),
-    sa.ForeignKeyConstraint(['payment_method_id'], ['payment_method.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -191,10 +180,9 @@ def downgrade():
     op.drop_table('transaction_view')
     op.drop_table('transaction')
     op.drop_table('payouts')
-    op.drop_table('virtual_card')
     op.drop_table('payment_intents')
+    op.drop_table('virtual_card')
     op.drop_table('beneficiaries')
-    op.drop_table('payment_method')
     op.drop_table('account')
     op.drop_table('user')
     # ### end Alembic commands ###
