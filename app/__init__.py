@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from app.config import Config
-from app.extensions import db, migrate
+from app.extensions import db, migrate, mail
 from app.swagger import swagger_bp
 
 # import Blueprint
@@ -15,6 +15,7 @@ from app.routes.card_payments import card_payments_bp
 from app.routes.transaction import transaction_bp
 from app.routes.wallet import wallet_bp
 from app.routes.webhooks import webhooks_bp
+from app.routes.two_factor_auth import two_factor_bp
 # from app.routes.invoice_payments import invoice_payments_bp
 
 from app import models
@@ -26,6 +27,7 @@ def create_app():
     # Init extensions
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
     JWTManager(app)
 
 
@@ -41,6 +43,7 @@ def create_app():
     app.register_blueprint(transaction_bp, url_prefix="/api")
     app.register_blueprint(wallet_bp, url_prefix="/api")
     app.register_blueprint(webhooks_bp, url_prefix="/api")
+    app.register_blueprint(two_factor_bp, url_prefix="/api")
     # app.register_blueprint(invoice_payments_bp, url_prefix="/api")
 
     return app
