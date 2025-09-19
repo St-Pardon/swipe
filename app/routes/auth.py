@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, decode_token, get_jwt, get_jwt_identity, jwt_required
 from app.models.user_model import User
+from app.models.two_factor_auth_model import TwoFactorAuth, TwoFactorAttempt
+from app.services.email_service import EmailService
 from app.extensions import db, BLOCKLIST
 from app.schema.user_schema import User_schema
 from datetime import timedelta
@@ -45,6 +47,47 @@ def login():
         return jsonify({"status": 401,
                         "message": "Invalid credentials"}), 401
 
+    # Check if 2FA is enabled
+    two_fa = TwoFactorAuth.query.filter_by(user_id=str(user.id)).first()
+    if two_fa and two_fa.is_enabled:
+        # Check for 2FA token
+        two_fa_token = data.get("two_fa_token")
+        backup_code = data.get("backup_code")
+        
+        if not two_fa_token and not backup_code:
+            return jsonify({
+                "status": 200,
+                "message": "2FA required",
+                "requires_2fa": True
+            }), 200
+        
+        # Check rate limiting
+        failed_attempts = TwoFactorAttempt.get_recent_failed_attempts(str(user.id))
+        if failed_attempts >= 5:
+            return jsonify({
+                "status": 429,
+                "message": "Too many failed 2FA attempts. Please try again later."
+            }), 429
+        
+        # Verify 2FA token or backup code
+        if two_fa_token:
+            if not two_fa.verify_token(two_fa_token):
+                TwoFactorAttempt.log_attempt(str(user.id), request.remote_addr, False, 'totp')
+                return jsonify({"status": 401, "message": "Invalid 2FA token"}), 401
+            TwoFactorAttempt.log_attempt(str(user.id), request.remote_addr, True, 'totp')
+        elif backup_code:
+            if not two_fa.verify_backup_code(backup_code):
+                TwoFactorAttempt.log_attempt(str(user.id), request.remote_addr, False, 'backup_code')
+                return jsonify({"status": 401, "message": "Invalid backup code"}), 401
+            TwoFactorAttempt.log_attempt(str(user.id), request.remote_addr, True, 'backup_code')
+
+    # Send login notification email
+    EmailService.send_login_notification_email(
+        user.email, 
+        user.name, 
+        request.remote_addr or "Unknown"
+    )
+
     access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role}, expires_delta=timedelta(days=1))
 
     user_schema = User_schema()
@@ -80,9 +123,11 @@ def forgot():
         additional_claims={"type": "password_reset"}
     )
     
+    # Send password reset email
+    EmailService.send_password_reset_email(user.email, reset_token)
+    
     return jsonify({"status": 200,
-                    "message": "Password reset token generated.",
-                    "reset_token": reset_token}), 200
+                    "message": "If a user exists, a password reset link has been sent."}), 200
 
 
 @auth_bp.route("/reset", methods=["POST"])

@@ -2,10 +2,13 @@ from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.guid_utils import GUID
 import uuid
+from sqlalchemy.orm import relationship
 from app.models.virtual_cards_model import VirtualCard
 
 
 class User(db.Model):
+    __tablename__ = 'user'
+    
     id = db.Column(GUID(), primary_key=True, default=uuid.uuid4)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
@@ -20,11 +23,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     accounts = db.relationship('Account', back_populates='user', cascade="all, delete-orphan")
     virtual_cards = db.relationship('VirtualCard', back_populates='user', cascade="all, delete-orphan")
-    transactions = db.relationship('Transaction', back_populates='user', cascade="all, delete-orphan")
+    transactions = relationship('Transaction', back_populates='user', cascade="all, delete-orphan")
     beneficiaries = db.relationship('Beneficiaries', back_populates='user', cascade="all, delete-orphan")
     payment_intents = db.relationship('PaymentIntent', back_populates='user', cascade="all, delete-orphan")
     payouts = db.relationship('Payout', back_populates='user', cascade="all, delete-orphan")
     # payment_methods = db.relationship('PaymentMethod', back_populates='user', cascade="all, delete-orphan")  # Removed
+    two_factor_auth = db.relationship('TwoFactorAuth', back_populates='user', uselist=False, cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):
