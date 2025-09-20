@@ -1,6 +1,16 @@
 from flask_restx import Resource, fields
+from flask import request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.swagger import api
 from app.api_docs import success_model, error_model
+from app.models.user_model import User
+from app.models.two_factor_auth_model import TwoFactorAuth, TwoFactorAttempt
+from app.services.email_service import EmailService
+from app.extensions import db
+import logging
+import pyotp
+
+logger = logging.getLogger(__name__)
 
 # Create namespace for 2FA
 two_factor_ns = api.namespace('2fa', description='Two-Factor Authentication operations')
@@ -37,13 +47,51 @@ class TwoFactorSetup(Resource):
     @api.response(400, 'Bad Request', error_model)
     @api.response(401, 'Unauthorized', error_model)
     @api.response(409, 'Conflict - 2FA already enabled', error_model)
+    @jwt_required()
     def post(self):
         """Setup Two-Factor Authentication
         
         Generates a new TOTP secret key and QR code for setting up 2FA.
         Returns the secret key, QR code image, and initial backup codes.
         """
-        pass
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            
+            if not user:
+                return {"status": 404, "message": "User not found"}, 404
+            
+            # Check if 2FA already exists
+            existing_2fa = TwoFactorAuth.query.filter_by(user_id=user_id).first()
+            if existing_2fa and existing_2fa.is_enabled:
+                return {"status": 400, "message": "2FA is already enabled"}, 400
+            
+            # Create or update 2FA record
+            if existing_2fa:
+                two_fa = existing_2fa
+                two_fa.secret_key = pyotp.random_base32()  # Generate new secret
+            else:
+                two_fa = TwoFactorAuth(user_id=user_id)
+                db.session.add(two_fa)
+            
+            # Generate QR code
+            qr_code = two_fa.get_qr_code(user.email)
+            
+            db.session.commit()
+            
+            return {
+                "status": 200,
+                "message": "2FA setup initiated",
+                "data": {
+                    "qr_code": qr_code,
+                    "secret_key": two_fa.secret_key,
+                    "manual_entry_key": two_fa.secret_key
+                }
+            }, 200
+            
+        except Exception as e:
+            logger.error(f"Error setting up 2FA: {str(e)}")
+            return {"status": 500, "message": "Internal server error"}, 500
 
 @two_factor_ns.route('/verify')
 class TwoFactorVerify(Resource):
@@ -86,12 +134,36 @@ class TwoFactorStatus(Resource):
     @api.marshal_with(success_model)
     @api.response(200, 'Success', success_model)
     @api.response(401, 'Unauthorized', error_model)
+    @jwt_required()
     def get(self):
         """Get Two-Factor Authentication Status
         
         Returns the current 2FA status and remaining backup codes count.
         """
-        pass
+        try:
+            user_id = get_jwt_identity()
+            two_fa = TwoFactorAuth.query.filter_by(user_id=user_id).first()
+            
+            if not two_fa:
+                return {
+                    "status": 200,
+                    "data": {
+                        "enabled": False,
+                        "backup_codes_remaining": 0
+                    }
+                }, 200
+            
+            return {
+                "status": 200,
+                "data": {
+                    "enabled": two_fa.is_enabled,
+                    "backup_codes_remaining": two_fa.get_remaining_backup_codes()
+                }
+            }, 200
+            
+        except Exception as e:
+            logger.error(f"Error getting 2FA status: {str(e)}")
+            return {"status": 500, "message": "Internal server error"}, 500
 
 @two_factor_ns.route('/backup-codes/regenerate')
 class TwoFactorBackupCodes(Resource):

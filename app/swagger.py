@@ -42,7 +42,7 @@ Most endpoints require JWT authentication. Include the token in requests as:
 Obtain tokens via the `/auth/login` or `/auth/register` endpoints.
 """,
     doc='/docs/',
-    prefix='/api',
+    prefix='/api/docs',
     authorizations={
         'Bearer': {
             'type': 'apiKey',
