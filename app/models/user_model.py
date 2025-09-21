@@ -29,6 +29,7 @@ class User(db.Model):
     payouts = db.relationship('Payout', back_populates='user', cascade="all, delete-orphan")
     # payment_methods = db.relationship('PaymentMethod', back_populates='user', cascade="all, delete-orphan")  # Removed
     two_factor_auth = db.relationship('TwoFactorAuth', back_populates='user', uselist=False, cascade="all, delete-orphan")
+    invoices = db.relationship('Invoice', back_populates='user', cascade="all, delete-orphan")
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     def set_password(self, password):

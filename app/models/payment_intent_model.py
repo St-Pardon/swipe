@@ -35,6 +35,10 @@ class PaymentIntent(db.Model):
     virtual_card_id = db.Column(GUID(), db.ForeignKey('virtual_card.id'), nullable=True)
     virtual_card = db.relationship('VirtualCard', back_populates='payment_intents')
     
+    # Invoice relationship for invoice payments
+    invoice_id = db.Column(GUID(), db.ForeignKey('invoice.id'), nullable=True)
+    invoice = db.relationship('Invoice', back_populates='payment_intents')
+    
     # Additional metadata (stored as text for SQLite compatibility)
     meta_data = db.Column(db.Text, nullable=True)
     description = db.Column(db.Text, nullable=True)

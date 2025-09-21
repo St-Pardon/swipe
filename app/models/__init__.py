@@ -7,4 +7,5 @@ from .payment_intent_model import PaymentIntent
 from .payout_model import Payout
 from .transactions_model import Transaction, TransactionView
 from .two_factor_auth_model import TwoFactorAuth, TwoFactorAttempt
+from .invoice_model import Invoice
 # from app.models.payment_methods_model import PaymentMethod  # Removed

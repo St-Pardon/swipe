@@ -15,7 +15,8 @@ from app.routes.transaction import transaction_bp
 from app.routes.wallet import wallet_bp
 from app.routes.webhooks import webhooks_bp
 from app.routes.two_factor_auth import two_factor_bp
-# from app.routes.invoice_payments import invoice_payments_bp
+from app.routes.invoice import invoice_bp
+from app.routes.invoice_payments import invoice_payments_bp
 
 from app import models
 
@@ -42,6 +43,7 @@ def create_app():
     app.register_blueprint(wallet_bp, url_prefix="/api")
     app.register_blueprint(webhooks_bp, url_prefix="/api")
     app.register_blueprint(two_factor_bp, url_prefix="/api")
-    # app.register_blueprint(invoice_payments_bp, url_prefix="/api")
+    app.register_blueprint(invoice_bp, url_prefix="/api")
+    app.register_blueprint(invoice_payments_bp, url_prefix="/api")
 
     return app
