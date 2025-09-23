@@ -49,6 +49,7 @@ user_model = api.model('User', {
     'country': fields.String(description='Country'),
     'countryCode': fields.String(description='Country code'),
     'role': fields.String(description='User role'),
+    'email_verified': fields.Boolean(description='Email verification status'),
     'created_at': fields.String(description='Creation timestamp'),
     'updated_at': fields.String(description='Last update timestamp')
 })

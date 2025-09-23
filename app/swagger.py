@@ -62,6 +62,8 @@ cards_ns = api.namespace('cards', description='Virtual card operations')
 wallets_ns = api.namespace('wallets', description='Wallet and transfer operations')
 transactions_ns = api.namespace('transactions', description='Transaction history operations')
 webhooks_ns = api.namespace('webhooks', description='Webhook handling operations')
+invoices_ns = api.namespace('invoices', description='Invoice management operations')
+invoice_payments_ns = api.namespace('invoice-payments', description='Invoice payment processing operations')
 
 # Import documentation classes to register them
 from app.docs.auth_docs import *
@@ -72,3 +74,5 @@ from app.docs.cards_docs import *
 from app.docs.transactions_docs import *
 from app.docs.webhooks_docs import *
 from app.docs.two_factor_auth_docs import *
+from app.docs.invoice_docs import *
+from app.docs.invoice_payments_docs import *

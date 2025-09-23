@@ -2,6 +2,7 @@ from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.guid_utils import GUID
 import uuid
+import secrets
 from sqlalchemy.orm import relationship
 from app.models.virtual_cards_model import VirtualCard
 
@@ -20,6 +21,8 @@ class User(db.Model):
     role = db.Column(db.String(120), nullable=False, default='user')
     address = db.Column(db.String(120), nullable=True)
     phone = db.Column(db.String(120), nullable=False)
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
+    email_verification_token = db.Column(db.String(256), nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     accounts = db.relationship('Account', back_populates='user', cascade="all, delete-orphan")
     virtual_cards = db.relationship('VirtualCard', back_populates='user', cascade="all, delete-orphan")
@@ -37,3 +40,17 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+    def generate_email_verification_token(self):
+        """Generate a secure token for email verification"""
+        self.email_verification_token = secrets.token_urlsafe(32)
+        return self.email_verification_token
+
+    def verify_email_token(self, token):
+        """Verify email verification token"""
+        return self.email_verification_token == token
+
+    def mark_email_verified(self):
+        """Mark user's email as verified"""
+        self.email_verified = True
+        self.email_verification_token = None  # Clear the token after verification

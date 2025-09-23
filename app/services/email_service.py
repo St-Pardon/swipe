@@ -40,8 +40,50 @@ class EmailService:
             return False
     
     @staticmethod
+    def send_verification_email(user_email, user_name, verification_token):
+        """Send email verification email"""
+        subject = "Verify Your Email - Swipe Payment"
+        template = """
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #007bff; text-align: center;">Email Verification Required</h2>
+                <p>Hello {{ user_name }},</p>
+                <p>Welcome to Swipe Payment! Please verify your email address to activate your account.</p>
+                <p>Click the button below to verify your email:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{{ verification_url }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Verify Email Address</a>
+                </div>
+                <p>Or copy and paste this link in your browser:</p>
+                <div style="background-color: #e9ecef; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; word-break: break-all; margin: 20px 0;">
+                    {{ verification_url }}
+                </div>
+                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <strong>Important:</strong> This verification link will expire in 24 hours for security reasons.
+                </div>
+                <p>If you did not create an account with Swipe Payment, please ignore this email.</p>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    This is an automated message from Swipe Payment. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        from flask import url_for
+        verification_url = url_for('auth.verify_email', token=verification_token, _external=True)
+
+        return EmailService.send_email(
+            to=user_email,
+            subject=subject,
+            template=template,
+            user_name=user_name,
+            verification_url=verification_url
+        )
+
+    @staticmethod
     def send_password_reset_email(user_email, reset_token):
-        """Send password reset email"""
         subject = "Password Reset - Swipe Payment"
         template = """
         <html>

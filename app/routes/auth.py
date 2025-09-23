@@ -25,17 +25,25 @@ def register():
         return jsonify({"status": 409,
                         "message": "User already exists"}), 409
 
+    # Generate email verification token
+    verification_token = user.generate_email_verification_token()
+
     db.session.add(user)
     db.session.commit()
 
-    access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role}, expires_delta=timedelta(days=1))
+    # Send verification email
+    EmailService.send_verification_email(
+        user.email,
+        user.name,
+        verification_token
+    )
 
     user_schema = User_schema()
     return jsonify({"status": 201,
-                    "message": "User created successfully",
+                    "message": "User created successfully. Please check your email to verify your account.",
                     "data": {
-                        "token":access_token,
-                        "user": user_schema.dump(user)
+                        "user": user_schema.dump(user),
+                        "email_verification_required": True
                     }}), 201
 
 @auth_bp.route("/login", methods=["POST"])
@@ -46,6 +54,11 @@ def login():
     if not user or not user.check_password(data.get("password")):
         return jsonify({"status": 401,
                         "message": "Invalid credentials"}), 401
+
+    # Check if email is verified
+    if not user.email_verified:
+        return jsonify({"status": 403,
+                        "message": "Email not verified. Please check your email for verification instructions."}), 403
 
     # Check if 2FA is enabled
     two_fa = TwoFactorAuth.query.filter_by(user_id=str(user.id)).first()
@@ -97,6 +110,77 @@ def login():
                         "token":access_token,
                         "user": user_schema.dump(user)
                     }})
+
+@auth_bp.route("/verify-email", methods=["GET"])
+def verify_email():
+    token = request.args.get("token")
+
+    if not token:
+        return jsonify({"status": 400,
+                        "message": "Verification token is required"}), 400
+
+    # Find user by verification token
+    user = User.query.filter_by(email_verification_token=token).first()
+
+    if not user:
+        return jsonify({"status": 404,
+                        "message": "Invalid or expired verification token"}), 404
+
+    # Verify the token and mark email as verified
+    if user.verify_email_token(token):
+        user.mark_email_verified()
+        db.session.commit()
+
+        # Generate access token for immediate login
+        access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role}, expires_delta=timedelta(days=1))
+
+        user_schema = User_schema()
+        return jsonify({"status": 200,
+                        "message": "Email verified successfully. Welcome to Swipe Payment!",
+                        "data": {
+                            "token": access_token,
+                            "user": user_schema.dump(user)
+                        }}), 200
+    else:
+        return jsonify({"status": 400,
+                        "message": "Invalid verification token"}), 400
+
+@auth_bp.route("/resend-verification", methods=["POST"])
+def resend_verification():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"status": 400,
+                        "message": "Email is required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"status": 404,
+                        "message": "User not found"}), 404
+
+    if user.email_verified:
+        return jsonify({"status": 400,
+                        "message": "Email is already verified"}), 400
+
+    # Generate new verification token
+    verification_token = user.generate_email_verification_token()
+    db.session.commit()
+
+    # Send verification email
+    success = EmailService.send_verification_email(
+        user.email,
+        user.name,
+        verification_token
+    )
+
+    if success:
+        return jsonify({"status": 200,
+                        "message": "Verification email sent successfully"}), 200
+    else:
+        return jsonify({"status": 500,
+                        "message": "Failed to send verification email. Please try again later."}), 500
 
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()

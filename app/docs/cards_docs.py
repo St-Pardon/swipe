@@ -135,6 +135,38 @@ class CardTransactions(Resource):
         """
         pass  # Implementation handled by actual card_payments.py route
 
+@cards_ns.route('/cards/<string:card_id>/payment-method')
+class CardPaymentMethod(Resource):
+    @cards_ns.doc('get_card_payment_method', security='Bearer')
+    @cards_ns.marshal_with(success_model, code=200)
+    @cards_ns.response(401, 'Unauthorized', error_model)
+    @cards_ns.response(404, 'Card not found', error_model)
+    @cards_ns.response(500, 'Internal server error', error_model)
+    def get(self, card_id):
+        """
+        Get card payment method
+        
+        Retrieve the Stripe payment method linked to a virtual card.
+        Returns payment method details including type, last4 digits, and expiration.
+        """
+        pass  # Implementation handled by actual card.py route
+
+@cards_ns.route('/payment-methods/available')
+class AvailablePaymentMethods(Resource):
+    @cards_ns.doc('get_available_payment_methods', security='Bearer')
+    @cards_ns.marshal_with(success_model, code=200)
+    @cards_ns.response(401, 'Unauthorized', error_model)
+    @cards_ns.response(500, 'Internal server error', error_model)
+    def get(self):
+        """
+        Get available payment methods
+        
+        Retrieve a list of available payment methods that can be linked to virtual cards.
+        In development mode, returns mock payment method data.
+        In production mode, queries Stripe for available payment methods.
+        """
+        pass  # Implementation handled by actual card.py route
+
 @cards_ns.route('/cards/<string:card_id>/spending-limit')
 class CardSpendingLimit(Resource):
     @cards_ns.doc('update_spending_limit', security='Bearer')

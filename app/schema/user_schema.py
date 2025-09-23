@@ -23,6 +23,8 @@ class User_schema(SQLAlchemySchema):
     role = auto_field(validate=validate.OneOf(['user', 'admin']))
     address = auto_field()
     phone = auto_field()
+    email_verified = auto_field(dump_only=True)
+    email_verification_token = fields.String(load_only=True)
 
     @post_load
     def create_user(self, data, **kwargs):

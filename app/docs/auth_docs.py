@@ -1,4 +1,4 @@
-from flask_restx import Resource
+from flask_restx import Resource, fields
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token, decode_token, get_jwt, get_jwt_identity, jwt_required
 from app.swagger import auth_ns
@@ -17,12 +17,14 @@ class Login(Resource):
     @auth_ns.expect(login_model)
     @auth_ns.marshal_with(auth_response, code=200)
     @auth_ns.response(401, 'Invalid credentials', error_model)
+    @auth_ns.response(403, 'Email not verified', error_model)
     @auth_ns.response(400, 'Invalid data', error_model)
     def post(self):
         """
         User login
         
         Authenticate user with email and password to receive JWT access token.
+        Email verification is required before login is allowed.
         The token should be included in subsequent requests as: Authorization: Bearer {token}
         """
         data = request.get_json()
@@ -97,7 +99,8 @@ class Register(Resource):
         User registration
         
         Create a new user account with email, password and profile information.
-        Returns JWT access token for immediate authentication.
+        Email verification is required before the account can be used for login.
+        A verification email will be sent to the provided email address.
         """
         data = request.get_json()
         try:
@@ -185,5 +188,40 @@ class ChangePassword(Resource):
         
         Change user password when authenticated.
         Requires current password for verification and new password cannot be the same.
+        """
+        pass  # Implementation handled by actual auth.py route
+
+@auth_ns.route('/verify-email')
+class VerifyEmail(Resource):
+    @auth_ns.doc('verify_email')
+    @auth_ns.param('token', 'Email verification token from email', _in='query', required=True)
+    @auth_ns.marshal_with(auth_response, code=200)
+    @auth_ns.response(400, 'Invalid or missing token', error_model)
+    @auth_ns.response(404, 'Invalid or expired verification token', error_model)
+    def get(self):
+        """
+        Verify email address
+
+        Verify user's email address using the token sent via email.
+        Upon successful verification, returns JWT access token for immediate authentication.
+        """
+        pass  # Implementation handled by actual auth.py route
+
+@auth_ns.route('/resend-verification')
+class ResendVerification(Resource):
+    @auth_ns.doc('resend_verification')
+    @auth_ns.expect(auth_ns.model('ResendVerification', {
+        'email': fields.String(required=True, description='User email address', example='user@example.com')
+    }))
+    @auth_ns.marshal_with(success_model, code=200)
+    @auth_ns.response(400, 'Email is required or already verified', error_model)
+    @auth_ns.response(404, 'User not found', error_model)
+    @auth_ns.response(500, 'Failed to send verification email', error_model)
+    def post(self):
+        """
+        Resend verification email
+
+        Resend email verification email to user.
+        Generates a new verification token and sends it to the user's email address.
         """
         pass  # Implementation handled by actual auth.py route
