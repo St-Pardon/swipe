@@ -233,3 +233,168 @@ class EmailService:
             currency=currency,
             transaction_time=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
         )
+
+    @staticmethod
+    def send_welcome_email(user_email, user_name):
+        """Send welcome email to new users"""
+        subject = "Welcome to Swipe Payment!"
+        template = """
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #007bff; text-align: center;">Welcome to Swipe Payment!</h2>
+                <p>Hello {{ user_name }},</p>
+                <p>Welcome to Swipe Payment! Your account has been created successfully.</p>
+                <div style="background-color: #e9ecef; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #007bff;">What's Next?</h3>
+                    <ul>
+                        <li>Complete your profile information</li>
+                        <li>Set up two-factor authentication for security</li>
+                        <li>Add payment methods to start transacting</li>
+                        <li>Explore our API documentation</li>
+                    </ul>
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{{ dashboard_url }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Go to Dashboard</a>
+                </div>
+                <p>If you have any questions, feel free to contact our support team.</p>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    This is an automated message from Swipe Payment. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        from flask import url_for
+        dashboard_url = url_for('dashboard.index', _external=True)
+
+        return EmailService.send_email(
+            to=user_email,
+            subject=subject,
+            template=template,
+            user_name=user_name,
+            dashboard_url=dashboard_url
+        )
+
+    @staticmethod
+    def send_security_alert_email(user_email, user_name, alert_type, details):
+        """Send security alert email"""
+        subject = f"Security Alert - {alert_type.title()} - Swipe Payment"
+        template = """
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #dc3545; text-align: center;">🚨 Security Alert</h2>
+                <p>Hello {{ user_name }},</p>
+                <p>We detected suspicious activity on your Swipe Payment account:</p>
+                <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <strong>Alert Details:</strong><br>
+                    <strong>Type:</strong> {{ alert_type }}<br>
+                    <strong>Details:</strong> {{ details }}<br>
+                    <strong>Time:</strong> {{ alert_time }}
+                </div>
+                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <strong>Immediate Actions Required:</strong>
+                    <ul style="margin: 10px 0;">
+                        <li>Review your recent account activity</li>
+                        <li>Change your password if you suspect unauthorized access</li>
+                        <li>Enable two-factor authentication</li>
+                        <li>Contact support if this wasn't you</li>
+                    </ul>
+                </div>
+                <p>This alert was sent because we take your account security seriously.</p>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    This is an automated security alert from Swipe Payment. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        from datetime import datetime
+        return EmailService.send_email(
+            to=user_email,
+            subject=subject,
+            template=template,
+            user_name=user_name,
+            alert_type=alert_type,
+            details=details,
+            alert_time=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        )
+
+    @staticmethod
+    def send_system_notification_email(user_email, user_name, title, message, category):
+        """Send system notification email"""
+        subject = f"System Notification - {title} - Swipe Payment"
+        template = """
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #007bff; text-align: center;">{{ title }}</h2>
+                <p>Hello {{ user_name }},</p>
+                <div style="background-color: #e9ecef; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    {{ message }}
+                </div>
+                <p>If you have any questions about this notification, please contact our support team.</p>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    This is an automated message from Swipe Payment. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return EmailService.send_email(
+            to=user_email,
+            subject=subject,
+            template=template,
+            user_name=user_name,
+            title=title,
+            message=message,
+            category=category
+        )
+
+    @staticmethod
+    def send_transaction_email(user_email, user_name, title, message):
+        """Send transaction notification email"""
+        subject = f"Transaction Update - {title} - Swipe Payment"
+        template = """
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #28a745; text-align: center;">💳 Transaction Update</h2>
+                <p>Hello {{ user_name }},</p>
+                <div style="background-color: #d4edda; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <strong>{{ title }}</strong><br><br>
+                    {{ message }}
+                </div>
+                <p>You can view all your transactions in your account dashboard.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{{ dashboard_url }}" style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Transactions</a>
+                </div>
+                <p>If you have any questions about this transaction, please contact our support team.</p>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    This is an automated message from Swipe Payment. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        from flask import url_for
+        dashboard_url = url_for('dashboard.transactions', _external=True)
+
+        return EmailService.send_email(
+            to=user_email,
+            subject=subject,
+            template=template,
+            user_name=user_name,
+            title=title,
+            message=message,
+            dashboard_url=dashboard_url
+        )
