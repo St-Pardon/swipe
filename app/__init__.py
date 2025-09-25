@@ -17,6 +17,8 @@ from app.routes.webhooks import webhooks_bp
 from app.routes.two_factor_auth import two_factor_bp
 from app.routes.invoice import invoice_bp
 from app.routes.invoice_payments import invoice_payments_bp
+from app.routes.notifications import notifications_bp
+from app.routes.admin_notifications import admin_bp
 
 from app import models
 
@@ -45,5 +47,7 @@ def create_app():
     app.register_blueprint(two_factor_bp, url_prefix="/api")
     app.register_blueprint(invoice_bp, url_prefix="/api")
     app.register_blueprint(invoice_payments_bp, url_prefix="/api")
+    app.register_blueprint(notifications_bp, url_prefix="/api")
+    app.register_blueprint(admin_bp, url_prefix="/api")
 
     return app

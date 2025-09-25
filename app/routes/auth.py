@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, decode_token, get_jwt, get_jwt_identity, jwt_required
 from app.models.user_model import User
 from app.models.two_factor_auth_model import TwoFactorAuth, TwoFactorAttempt
+from app.models.notification_model import Notification, NotificationSettings
 from app.services.email_service import EmailService
+from app.services.notification_service import NotificationService
 from app.extensions import db, BLOCKLIST
 from app.schema.user_schema import User_schema
 from datetime import timedelta
@@ -31,12 +33,28 @@ def register():
     db.session.add(user)
     db.session.commit()
 
+    # Create default notification settings for new user
+    default_settings = NotificationSettings.create_default_settings(user.id)
+    db.session.add(default_settings)
+
+    # Send welcome notification via both in-app and email
+    welcome_notification = Notification(
+        user_id=user.id,
+        title="Welcome to Swipe Payment!",
+        message="Your account has been created successfully. You can now send and receive payments.",
+        category="system",
+        priority="medium"
+    )
+    db.session.add(welcome_notification)
+
     # Send verification email
     EmailService.send_verification_email(
         user.email,
         user.name,
         verification_token
     )
+
+    db.session.commit()
 
     user_schema = User_schema()
     return jsonify({"status": 201,
