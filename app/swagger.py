@@ -64,6 +64,8 @@ transactions_ns = api.namespace('transactions', description='Transaction history
 webhooks_ns = api.namespace('webhooks', description='Webhook handling operations')
 invoices_ns = api.namespace('invoices', description='Invoice management operations')
 invoice_payments_ns = api.namespace('invoice-payments', description='Invoice payment processing operations')
+notifications_ns = api.namespace('notifications', description='User notification operations')
+admin_notifications_ns = api.namespace('admin', description='Administrative notification operations')
 
 # Import documentation classes to register them
 from app.docs.auth_docs import *
@@ -76,3 +78,5 @@ from app.docs.webhooks_docs import *
 from app.docs.two_factor_auth_docs import *
 from app.docs.invoice_docs import *
 from app.docs.invoice_payments_docs import *
+from app.docs.notifications_docs import *
+from app.docs.admin_notifications_docs import *

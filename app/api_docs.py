@@ -214,3 +214,97 @@ success_with_pagination = api.model('SuccessWithPagination', {
     'data': fields.Raw(description='Response data'),
     'pagination': fields.Nested(pagination_model, description='Pagination information')
 })
+
+# Notification Models
+notification_detail_model = api.model('NotificationDetail', {
+    'id': fields.String(description='Notification ID', example='9d35d1bf-8aea-4fca-9c77-6ad0f3a7b653'),
+    'user_id': fields.String(description='Owner user ID', example='a3e2e7ff-94e4-4a2a-b3f9-413b5ddbadc0'),
+    'title': fields.String(description='Notification title', example='Wallet funding complete'),
+    'message': fields.String(description='Detailed notification message'),
+    'category': fields.String(description='Notification category', example='transaction'),
+    'priority': fields.String(description='Priority level', example='high'),
+    'is_read': fields.Boolean(description='Read status flag'),
+    'read_at': fields.String(description='Timestamp when notification was read', example='2024-02-10T14:30:00Z'),
+    'metadata': fields.Raw(description='Additional metadata payload'),
+    'created_at': fields.String(description='Creation timestamp', example='2024-02-10T14:25:00Z'),
+    'updated_at': fields.String(description='Last update timestamp', example='2024-02-10T14:25:00Z')
+})
+
+notification_toggle_request = api.model('NotificationToggleRequest', {
+    'is_read': fields.Boolean(required=False, description='Mark notification as read (true) or unread (false)', example=True)
+})
+
+notification_bulk_toggle_request = api.model('NotificationBulkToggleRequest', {
+    'notification_ids': fields.List(fields.String, required=True, description='List of notification IDs to update'),
+    'is_read': fields.Boolean(required=False, description='Read state to apply to the notifications', example=True)
+})
+
+notification_clear_params = api.model('NotificationClearParams', {
+    'category': fields.String(description='Filter notifications by category before clearing', example='system'),
+    'older_than': fields.String(description='ISO timestamp; clear notifications created before this time', example='2024-01-01T00:00:00Z'),
+    'status': fields.String(description='Filter by status before clearing', enum=['read', 'unread'], example='read')
+})
+
+notification_settings_model = api.model('NotificationSettings', {
+    'id': fields.String(description='Notification settings ID'),
+    'user_id': fields.String(description='Owner user ID'),
+    'email_security': fields.Boolean(description='Receive security notifications via email'),
+    'email_transaction': fields.Boolean(description='Receive transaction notifications via email'),
+    'email_system': fields.Boolean(description='Receive system notifications via email'),
+    'email_marketing': fields.Boolean(description='Receive marketing notifications via email'),
+    'in_app_security': fields.Boolean(description='Receive security notifications in app'),
+    'in_app_transaction': fields.Boolean(description='Receive transaction notifications in app'),
+    'in_app_system': fields.Boolean(description='Receive system notifications in app'),
+    'in_app_marketing': fields.Boolean(description='Receive marketing notifications in app'),
+    'push_enabled': fields.Boolean(description='Receive push notifications'),
+    'push_security': fields.Boolean(description='Enable push security notifications'),
+    'push_transaction': fields.Boolean(description='Enable push transaction notifications'),
+    'push_system': fields.Boolean(description='Enable push system notifications'),
+    'quiet_hours_start': fields.String(description='Quiet hours start time (HH:MM)', example='22:00'),
+    'quiet_hours_end': fields.String(description='Quiet hours end time (HH:MM)', example='06:00'),
+    'quiet_hours_enabled': fields.Boolean(description='Enable quiet hours for notifications'),
+    'created_at': fields.String(description='Creation timestamp'),
+    'updated_at': fields.String(description='Last update timestamp')
+})
+
+notification_settings_update_model = api.model('NotificationSettingsUpdate', {
+    'email_security': fields.Boolean(description='Toggle security notification emails'),
+    'email_transaction': fields.Boolean(description='Toggle transaction notification emails'),
+    'email_system': fields.Boolean(description='Toggle system notification emails'),
+    'email_marketing': fields.Boolean(description='Toggle marketing notification emails'),
+    'in_app_security': fields.Boolean(description='Toggle in-app security notifications'),
+    'in_app_transaction': fields.Boolean(description='Toggle in-app transaction notifications'),
+    'in_app_system': fields.Boolean(description='Toggle in-app system notifications'),
+    'in_app_marketing': fields.Boolean(description='Toggle in-app marketing notifications'),
+    'push_enabled': fields.Boolean(description='Toggle push notifications globally'),
+    'push_security': fields.Boolean(description='Toggle push security notifications'),
+    'push_transaction': fields.Boolean(description='Toggle push transaction notifications'),
+    'push_system': fields.Boolean(description='Toggle push system notifications'),
+    'quiet_hours_start': fields.String(description='Quiet hours start (HH:MM)', example='21:00'),
+    'quiet_hours_end': fields.String(description='Quiet hours end (HH:MM)', example='07:00'),
+    'quiet_hours_enabled': fields.Boolean(description='Enable or disable quiet hours')
+})
+
+broadcast_notification_model = api.model('BroadcastNotificationRequest', {
+    'title': fields.String(required=True, description='Notification title', example='Scheduled maintenance'),
+    'message': fields.String(required=True, description='Notification message body'),
+    'category': fields.String(description='Notification category', example='system'),
+    'priority': fields.String(description='Notification priority', example='medium'),
+    'notification_types': fields.List(fields.String, description='Channels to use (in_app, email, push)'),
+    'target_users': fields.String(description="Audience selector ('all', 'verified', 'active')", example='all'),
+    'user_filters': fields.Raw(description='Optional filter dictionary for advanced targeting'),
+    'metadata': fields.Raw(description='Additional metadata payload to attach to notifications')
+})
+
+notification_payload_model = api.model('NotificationPayload', {
+    'title': fields.String(required=True, description='Notification title', example='Balance low'),
+    'message': fields.String(required=True, description='Notification message body'),
+    'category': fields.String(description='Notification category', example='transaction'),
+    'priority': fields.String(description='Notification priority', example='high'),
+    'metadata': fields.Raw(description='Additional metadata payload')
+})
+
+bulk_notification_request_model = api.model('BulkNotificationRequest', {
+    'user_ids': fields.List(fields.String, required=True, description='List of user IDs to target'),
+    'notifications': fields.List(fields.Nested(notification_payload_model), required=True, description='Notifications to create for each user')
+})
