@@ -9,6 +9,7 @@ from app.extensions import db
 from decimal import Decimal
 import logging
 from app.routes.transaction import create_transaction
+from app.services.notification_service import NotificationService
 
 wallet_bp = Blueprint('wallet', __name__)
 logger = logging.getLogger(__name__)
@@ -97,6 +98,23 @@ def fund_wallet():
                 "status": payment_intent.status
             }
         }), 201
+        
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Wallet funding initiated",
+                message=f"We have started funding your wallet with {amount} {currency}.",
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "payment_intent_id": str(payment_intent.id),
+                    "account_id": str(account_id),
+                    "amount": str(amount),
+                    "currency": currency
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Wallet funding notification failed: {notify_err}")
         
     except ValueError as e:
         return jsonify({
@@ -222,6 +240,24 @@ def withdraw_funds():
                 "estimated_arrival": payout.get_estimated_arrival().isoformat()
             }
         }), 201
+        
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Withdrawal initiated",
+                message=f"A withdrawal of {amount} {currency} to account {account_number[-4:]} has been initiated.",
+                category='transaction',
+                priority='high',
+                metadata={
+                    "payout_id": str(payout.id),
+                    "account_id": str(account_id),
+                    "amount": str(amount),
+                    "currency": currency,
+                    "method": method
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Withdrawal notification failed: {notify_err}")
         
     except ValueError as e:
         return jsonify({
@@ -407,6 +443,24 @@ def transfer_funds():
                 "estimated_arrival": transfer.get_estimated_arrival().isoformat() if hasattr(transfer, 'get_estimated_arrival') else None
             }
         }), 201
+        
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Transfer initiated",
+                message=f"Your {transfer_type} transfer of {amount} {currency} has been initiated.",
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "transfer_id": str(transfer.id),
+                    "transfer_type": transfer_type,
+                    "source_account_id": str(source_account_id),
+                    "amount": str(amount),
+                    "currency": currency
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Transfer notification failed: {notify_err}")
         
     except ValueError as e:
         return jsonify({

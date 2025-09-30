@@ -8,9 +8,9 @@ from app.models.account_model import Account
 from app.models.user_model import User
 from app.schema.virtual_cards_schema import VirtualCardSchema
 from app.extensions import db
-from app.config.payment_config import PaymentConfig
 from app.services.payment_service import PaymentService
 from app.config.payment_config import PaymentConfig
+from app.services.notification_service import NotificationService
 from decimal import Decimal
 
 # Initialize Stripe using configured secret key
@@ -109,18 +109,46 @@ def create_card():
                     "status": 400,
                     "message": f"Failed to verify Stripe payment method: {str(e)}"
                 }), 400
+            except Exception as verify_err:
+                logging.warning(f"Stripe verification error: {verify_err}")
+                return jsonify({
+                    "status": 400,
+                    "message": "Unable to verify Stripe payment method."
+                }), 400
 
         db.session.add(new_card)
         db.session.commit()
         
         result = card_schema.dump(new_card)
-        
+
+        try:
+            card_number = new_card.card_number
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="New card created",
+                message="A new {card_type} card ending in {last4} was created for your {currency} wallet.".format(
+                    card_type=new_card.card_type,
+                    last4=card_number[-4:] if card_number else "****",
+                    currency=account.currency_code
+                ),
+                category='account',
+                priority='medium',
+                metadata={
+                    "card_id": str(new_card.id),
+                    "account_id": str(account.id),
+                    "card_type": new_card.card_type,
+                    "currency": account.currency_code
+                }
+            )
+        except Exception as notify_err:
+            logging.warning(f"Card creation notification failed: {notify_err}")
+
         return jsonify({
             "status": 201,
             "message": "Card created successfully",
             "data": result
         }), 201
-        
+
     except ValueError as e:
         return jsonify({
             "status": 400,
@@ -247,10 +275,28 @@ def deactivate_card(card_id):
         # Deactivate the card
         card.is_active = False
         db.session.commit()
-        
+
         card_schema = VirtualCardSchema()
         result = card_schema.dump(card)
-        
+
+        try:
+            card_number = card.card_number
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Card deactivated",
+                message="Your card ending in {last4} has been deactivated.".format(
+                    last4=card_number[-4:] if card_number else "****"
+                ),
+                category='security',
+                priority='high',
+                metadata={
+                    "card_id": str(card.id),
+                    "action": "deactivate"
+                }
+            )
+        except Exception as notify_err:
+            logging.warning(f"Card deactivation notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Card deactivated successfully",
@@ -358,6 +404,24 @@ def delete_card(id):
         db.session.delete(card)
         db.session.commit()
 
+        try:
+            card_number = card.card_number
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Card deleted",
+                message="Your card ending in {last4} has been deleted.".format(
+                    last4=card_number[-4:] if card_number else "****"
+                ),
+                category='security',
+                priority='high',
+                metadata={
+                    "card_id": str(id),
+                    "payment_method": stripe_payment_method_id
+                }
+            )
+        except Exception as notify_err:
+            logging.warning(f"Card deletion notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Card deleted successfully" + (f" and payment method detached from Stripe" if stripe_payment_method_id else "")
@@ -393,6 +457,23 @@ def change_pin(id):
 
         card.pin = data.get('new_pin')
         db.session.commit()
+
+        try:
+            card_number = card.card_number
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Card PIN changed",
+                message="The PIN for your card ending in {last4} was changed successfully.".format(
+                    last4=card_number[-4:] if card_number else "****"
+                ),
+                category='security',
+                priority='high',
+                metadata={
+                    "card_id": str(card.id)
+                }
+            )
+        except Exception as notify_err:
+            logging.warning(f"Card PIN change notification failed: {notify_err}")
 
         return jsonify({
             "status": 200,
@@ -476,10 +557,29 @@ def link_payment_method(card_id):
         # Link the payment method to the card
         card.stripe_payment_method_id = stripe_payment_method_id
         db.session.commit()
-        
+
         card_schema = VirtualCardSchema()
         result = card_schema.dump(card)
-        
+
+        try:
+            card_number = card.card_number
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Payment method linked",
+                message="Card ending in {last4} is now linked to payment method {pm}.".format(
+                    last4=card_number[-4:] if card_number else "****",
+                    pm=stripe_payment_method_id
+                ),
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "card_id": str(card.id),
+                    "payment_method": stripe_payment_method_id
+                }
+            )
+        except Exception as notify_err:
+            logging.warning(f"Card payment method link notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Payment method linked successfully",

@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from sqlalchemy import or_
+from sqlalchemy import or_, cast
+from sqlalchemy.sql import text
+from sqlalchemy.types import String
 from datetime import datetime
 from app.extensions import db
 
@@ -85,44 +87,87 @@ def get_transactions():
     """Get all transactions for the authenticated user with filtering, pagination and sorting"""
     try:
         user_id = get_jwt_identity()
-        
-        # Get query parameters for filtering, pagination and sorting
-        page = request.args.get('page', 1, type=int)
-        size = request.args.get('size', 10, type=int)
-        transaction_type = request.args.get('transaction_type')
-        transaction_status = request.args.get('transaction_status')
-        search = request.args.get('search', default='', type=str)
-        
+
+        page = request.args.get("page", default=1, type=int)
+        size = request.args.get("size", default=10, type=int)
+        page = 1 if page < 1 else page
+        size = 10 if size < 1 else size
+
+        transaction_type = request.args.get("type") or request.args.get("transaction_type")
+        transaction_status = request.args.get("status") or request.args.get("transaction_status")
+        search = request.args.get("search", default="", type=str).strip()
+        start_date_str = request.args.get("start_date")
+        end_date_str = request.args.get("end_date")
+        sort_by = request.args.get("sort_by", default="created_at")
+        sort_order = request.args.get("sort_order", default="desc").lower()
+
         query = Transaction.query.filter_by(user_id=user_id)
 
-        if search:
-            query = query.filter(or_(
-                Transaction.description.ilike(f'%{search}%'),
-                Transaction.amount.ilike(f'%{search}%'),
-                Transaction.fee.ilike(f'%{search}%'),
-                Transaction.type.ilike(f'%{search}%'),
-                Transaction.status.ilike(f'%{search}%')
-            ))
-
-        # add type and status
         if transaction_type:
             query = query.filter(Transaction.type == transaction_type)
+
         if transaction_status:
             query = query.filter(Transaction.status == transaction_status)
 
-        # Apply pagination
+        if start_date_str:
+            try:
+                start_date = datetime.fromisoformat(start_date_str)
+                query = query.filter(Transaction.created_at >= start_date)
+            except ValueError:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid start_date. Use ISO 8601 format (e.g. 2025-09-30T21:34:48)."
+                }), 400
+
+        if end_date_str:
+            try:
+                end_date = datetime.fromisoformat(end_date_str)
+                query = query.filter(Transaction.created_at <= end_date)
+            except ValueError:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid end_date. Use ISO 8601 format (e.g. 2025-09-30T21:34:48)."
+                }), 400
+
+        if search:
+            like_value = f"%{search}%"
+            query = query.filter(or_(
+                Transaction.description.ilike(like_value),
+                Transaction.type.ilike(like_value),
+                Transaction.status.ilike(like_value),
+                cast(Transaction.currency_code, String).ilike(like_value),
+                cast(Transaction.amount, String).ilike(like_value),
+                cast(Transaction.fee, String).ilike(like_value)
+            ))
+
+        if sort_by not in {"created_at", "amount", "status", "type"}:
+            sort_by = "created_at"
+
+        sort_column = getattr(Transaction, sort_by)
+        sort_column = sort_column.desc() if sort_order != "asc" else sort_column.asc()
+        query = query.order_by(sort_column)
+
         transactions = query.paginate(page=page, per_page=size, error_out=False)
 
-        transaction_schema = TransactionSchema(many=True)
-        result = transaction_schema.dump(transactions.items)
+        schema = TransactionSchema(many=True)
+        data = schema.dump(transactions.items)
 
         return jsonify({
             "status": 200,
             "message": "Transactions retrieved successfully",
-            "data": result
+            "data": data,
+            "pagination": {
+                "page": page,
+                "size": size,
+                "total": transactions.total,
+                "pages": transactions.pages,
+                "has_next": transactions.has_next,
+                "has_prev": transactions.has_prev,
+            }
         }), 200
 
     except Exception as e:
+        db.session.rollback()
         return jsonify({
             "status": 500,
             "message": "An error occurred while retrieving the transactions",

@@ -12,6 +12,7 @@ from app.schema.invoice_schema import (
     InvoiceResponseSchema, 
     InvoiceFilterSchema
 )
+from app.services.notification_service import NotificationService
 import logging
 
 invoice_bp = Blueprint('invoice', __name__)
@@ -39,6 +40,23 @@ def create_invoice():
         # Return created invoice
         response_schema = InvoiceResponseSchema()
         result = response_schema.dump(invoice)
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Invoice created",
+                message=f"Invoice {invoice.invoice_number or invoice.id} was created with status {invoice.status.value}.",
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "invoice_id": str(invoice.id),
+                    "status": invoice.status.value,
+                    "amount": str(invoice.total_amount),
+                    "currency": invoice.currency
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Invoice creation notification failed: {notify_err}")
         
         return jsonify({
             "status": 201,
@@ -206,9 +224,9 @@ def get_draft_invoices():
         size = request.args.get('size', 10, type=int)
         
         # Query draft invoices
-        invoices = Invoice.query.filter_by(
-            user_id=user_id, 
-            status=InvoiceStatus.DRAFT
+        invoices = Invoice.query.filter(
+            Invoice.user_id == user_id,
+            Invoice.status == InvoiceStatus.DRAFT.value
         ).order_by(desc(Invoice.created_at)).paginate(
             page=page, per_page=size, error_out=False
         )
@@ -249,9 +267,9 @@ def get_pending_invoices():
         size = request.args.get('size', 10, type=int)
         
         # Query pending invoices
-        invoices = Invoice.query.filter_by(
-            user_id=user_id, 
-            status=InvoiceStatus.PENDING
+        invoices = Invoice.query.filter(
+            Invoice.user_id == user_id,
+            Invoice.status == InvoiceStatus.PENDING.value
         ).order_by(desc(Invoice.due_date)).paginate(
             page=page, per_page=size, error_out=False
         )
@@ -301,7 +319,7 @@ def get_due_invoices():
             Invoice.user_id == user_id,
             Invoice.due_date <= seven_days_from_now,
             Invoice.due_date >= now,
-            Invoice.status.notin_([InvoiceStatus.PAID, InvoiceStatus.CANCELLED])
+            Invoice.status.notin_([InvoiceStatus.PAID.value, InvoiceStatus.CANCELLED.value])
         )).order_by(asc(Invoice.due_date)).paginate(
             page=page, per_page=size, error_out=False
         )
@@ -345,7 +363,7 @@ def get_overdue_invoices():
         invoices = Invoice.query.filter(and_(
             Invoice.user_id == user_id,
             Invoice.due_date < datetime.utcnow(),
-            Invoice.status.notin_([InvoiceStatus.PAID, InvoiceStatus.CANCELLED])
+            Invoice.status.notin_([InvoiceStatus.PAID.value, InvoiceStatus.CANCELLED.value])
         )).order_by(desc(Invoice.due_date)).paginate(
             page=page, per_page=size, error_out=False
         )
@@ -447,6 +465,24 @@ def update_invoice(invoice_id):
         # Return updated invoice
         response_schema = InvoiceResponseSchema()
         result = response_schema.dump(invoice)
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Invoice updated",
+                message=f"Invoice {invoice.invoice_number or invoice.id} was updated and is now {invoice.status.value}.",
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "invoice_id": str(invoice.id),
+                    "status": invoice.status.value,
+                    "amount": str(invoice.total_amount),
+                    "currency": invoice.currency,
+                    "updated_fields": list(validated_data.keys())
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Invoice update notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,
@@ -494,6 +530,21 @@ def delete_invoice(invoice_id):
         # Delete invoice
         db.session.delete(invoice)
         db.session.commit()
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Invoice deleted",
+                message=f"Invoice {invoice.invoice_number or invoice.id} was deleted.",
+                category='transaction',
+                priority='low',
+                metadata={
+                    "invoice_id": str(invoice.id),
+                    "status": invoice.status.value
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Invoice deletion notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,

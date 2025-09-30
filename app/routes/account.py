@@ -6,6 +6,7 @@ from app.models.user_model import User
 from app.schema.account_schema import AccountSchema, VALID_CURRENCY_CODES
 from app.extensions import db
 from app.utils.xconverter import apply_margins, fetch_exchange_rates, get_exchange_rate
+from app.services.notification_service import NotificationService
 
 
 account_bp = Blueprint('account', __name__)
@@ -48,6 +49,25 @@ def create_account():
         db.session.commit()
 
         result = account_schema.dump(account)
+
+        try:
+            account_number = account.get_account_number()
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="New account created",
+                message=f"Your {account.currency_code} account"
+                        f"{' ending in ' + account_number[-4:] if account_number else ''}"
+                        " was created successfully.",
+                category='account',
+                priority='medium',
+                metadata={
+                    "account_id": str(account.id),
+                    "balance": str(account.balance),
+                    "currency": account.currency_code
+                }
+            )
+        except Exception as notify_err:
+            current_app.logger.warning(f"Account creation notification failed: {notify_err}")
 
         return jsonify({
             "status": 201,
@@ -147,6 +167,24 @@ def update_account(id):
         db.session.commit()
 
         result = account_schema.dump(updated_account)
+
+        try:
+            account_number = updated_account.get_account_number()
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Account updated",
+                message=f"Your {updated_account.currency_code} account"
+                        f"{' ending in ' + account_number[-4:] if account_number else ''}"
+                        " was updated successfully.",
+                category='account',
+                priority='low',
+                metadata={
+                    "account_id": str(updated_account.id),
+                    "updated_fields": list(data.keys())
+                }
+            )
+        except Exception as notify_err:
+            current_app.logger.warning(f"Account update notification failed: {notify_err}")
 
         return jsonify({
             "status": 200,
@@ -304,15 +342,35 @@ def close_account():
                 "status": 404,
                 "message": "Account not found"
             }), 404
-        
+
+        account_number = account.get_account_number()
+        account_currency = account.currency_code
+
         db.session.delete(account)
         db.session.commit()
-        
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="Account closed",
+                message=f"Your {account_currency} account"
+                        f"{' ending in ' + account_number[-4:] if account_number else ''}"
+                        " has been closed by an administrator.",
+                category='account',
+                priority='high',
+                metadata={
+                    "account_id": str(data["account_id"])
+                }
+            )
+        except Exception as notify_err:
+            current_app.logger.warning(f"Account closure notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Account closed successfully"
         }), 200
     except Exception as e:
         current_app.logger.error(f"Error in close_account: {str(e)}")
+        db.session.rollback()
         return jsonify({"status": 500, "message": "An error occurred while closing the account."}), 500
     

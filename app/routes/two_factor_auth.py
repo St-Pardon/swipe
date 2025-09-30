@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user_model import User
 from app.models.two_factor_auth_model import TwoFactorAuth, TwoFactorAttempt
 from app.services.email_service import EmailService
+from app.services.notification_service import NotificationService
 from app.extensions import db
 import pyotp
 import logging
@@ -38,6 +39,21 @@ def setup_2fa():
         qr_code = two_fa.get_qr_code(user.email)
         
         db.session.commit()
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="2FA setup started",
+                message="Two-factor authentication setup was initiated for your account.",
+                category='security',
+                priority='medium',
+                metadata={
+                    "action": "setup_started",
+                    "user_id": str(user_id)
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"2FA setup notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,
@@ -73,6 +89,20 @@ def verify_2fa():
         # Verify token
         if not two_fa.verify_token(token):
             TwoFactorAttempt.log_attempt(user_id, request.remote_addr, False, 'totp')
+            try:
+                NotificationService.create_notification(
+                    user_id=user_id,
+                    title="2FA verification failed",
+                    message="An incorrect 2FA token was entered on your account.",
+                    category='security',
+                    priority='high',
+                    metadata={
+                        "action": "verify_failed",
+                        "ip_address": request.remote_addr
+                    }
+                )
+            except Exception as notify_err:
+                logger.warning(f"2FA failure notification failed: {notify_err}")
             return jsonify({"status": 400, "message": "Invalid token"}), 400
         
         # Enable 2FA and generate backup codes
@@ -87,6 +117,21 @@ def verify_2fa():
         # Send confirmation email
         user = User.query.get(user_id)
         EmailService.send_2fa_setup_email(user.email, user.name)
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="2FA enabled",
+                message="Two-factor authentication is now enabled on your account.",
+                category='security',
+                priority='high',
+                metadata={
+                    "action": "enabled",
+                    "backup_codes": backup_codes
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"2FA enabled notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,
@@ -124,6 +169,20 @@ def disable_2fa():
         # Disable 2FA
         db.session.delete(two_fa)
         db.session.commit()
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="2FA disabled",
+                message="Two-factor authentication was disabled on your account.",
+                category='security',
+                priority='high',
+                metadata={
+                    "action": "disabled"
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"2FA disable notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,
@@ -187,6 +246,21 @@ def regenerate_backup_codes():
         # Generate new backup codes
         backup_codes = two_fa.generate_backup_codes()
         db.session.commit()
+
+        try:
+            NotificationService.create_notification(
+                user_id=user_id,
+                title="2FA backup codes regenerated",
+                message="New 2FA backup codes were generated for your account.",
+                category='security',
+                priority='medium',
+                metadata={
+                    "action": "backup_codes_regenerated",
+                    "backup_codes": backup_codes
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"2FA backup code notification failed: {notify_err}")
         
         return jsonify({
             "status": 200,

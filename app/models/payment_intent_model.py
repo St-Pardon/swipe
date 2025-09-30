@@ -68,15 +68,20 @@ class PaymentIntent(db.Model):
         )
     
     @classmethod
-    def create_invoice_payment_intent(cls, user_id, amount, currency, description=None):
+    def create_invoice_payment_intent(cls, user_id, amount, currency, description=None, invoice_id=None, metadata=None):
         """Create a payment intent for invoice payment"""
-        return cls(
+        intent = cls(
             user_id=user_id,
             amount=amount,
             currency=currency,
             intent_type='invoice_payment',
             description=description or f'Invoice payment of {amount} {currency}'
         )
+        if invoice_id:
+            intent.invoice_id = invoice_id
+        if metadata:
+            intent.meta_data = metadata
+        return intent
     
     def update_status(self, status, payment_method_id=None, payment_method_type=None):
         """Update payment intent status and related fields"""

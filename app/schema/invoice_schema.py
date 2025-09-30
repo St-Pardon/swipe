@@ -26,7 +26,7 @@ class InvoiceCreateSchema(Schema):
     status = fields.Str(load_default='draft', validate=validate.OneOf(['draft', 'pending']))
     
     @validates('due_date')
-    def validate_due_date(self, value):
+    def validate_due_date(self, value, **kwargs):
         if value and value <= datetime.utcnow():
             raise ValidationError('Due date must be in the future')
     
@@ -66,7 +66,7 @@ class InvoiceUpdateSchema(Schema):
     status = fields.Str(validate=validate.OneOf(['draft', 'pending', 'paid', 'overdue', 'cancelled']))
     
     @validates('due_date')
-    def validate_due_date(self, value):
+    def validate_due_date(self, value, **kwargs):
         if value and value <= datetime.utcnow():
             raise ValidationError('Due date must be in the future')
 

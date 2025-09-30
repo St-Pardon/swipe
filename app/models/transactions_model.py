@@ -1,8 +1,10 @@
+import uuid
+
 from app.extensions import db
 from app.utils.guid_utils import GUID
 
 class Transaction(db.Model):
-    id = db.Column(GUID(), primary_key=True)
+    id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='transactions')
     debit_account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=True)
@@ -28,7 +30,7 @@ class Transaction(db.Model):
 
 
 class TransactionView(db.Model):
-    id = db.Column(GUID(), primary_key=True)
+    id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     transaction_id = db.Column(GUID(), db.ForeignKey('transaction.id'), nullable=False)
     transaction = db.relationship('Transaction', back_populates='view')
     account_id = db.Column(GUID(), db.ForeignKey('account.id'), nullable=False)

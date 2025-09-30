@@ -5,6 +5,7 @@ from app.models.user_model import User
 from app.services.payment_service import PaymentService
 from app.config.payment_config import PaymentConfig
 from app.extensions import db
+from app.services.notification_service import NotificationService
 from decimal import Decimal
 import logging
 from app.routes.transaction import create_transaction
@@ -81,6 +82,23 @@ def create_invoice_payment_session(invoice_id):
         
         db.session.commit()
         
+        try:
+            NotificationService.create_notification(
+                user_id=invoice.user_id,
+                title="Invoice payment started",
+                message=f"Payment process started for invoice {invoice.invoice_number or invoice.id}.",
+                category='transaction',
+                priority='high',
+                metadata={
+                    "invoice_id": str(invoice.id),
+                    "payment_intent_id": str(payment_intent.id),
+                    "amount": str(amount),
+                    "currency": currency
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Invoice payment start notification failed: {notify_err}")
+        
         return jsonify({
             "status": 201,
             "message": "Payment session created successfully",
@@ -142,7 +160,38 @@ def handle_invoice_payment_success(invoice_id):
         
         # Check payment status
         payment_status = payment_intent.status
-        
+
+        try:
+            if payment_intent.is_successful():
+                NotificationService.create_notification(
+                    user_id=invoice.user_id,
+                    title="Invoice paid",
+                    message=f"Invoice {invoice.invoice_number or invoice.id} has been paid successfully.",
+                    category='transaction',
+                    priority='high',
+                    metadata={
+                        "invoice_id": str(invoice.id),
+                        "payment_intent_id": str(payment_intent.id),
+                        "amount": str(payment_intent.amount),
+                        "currency": payment_intent.currency
+                    }
+                )
+            else:
+                NotificationService.create_notification(
+                    user_id=invoice.user_id,
+                    title="Invoice payment status",
+                    message=f"Payment status for invoice {invoice.invoice_number or invoice.id} is {payment_status}.",
+                    category='transaction',
+                    priority='medium',
+                    metadata={
+                        "invoice_id": str(invoice.id),
+                        "payment_intent_id": str(payment_intent.id),
+                        "status": payment_status
+                    }
+                )
+        except Exception as notify_err:
+            logger.warning(f"Invoice payment success notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Payment status retrieved successfully",
@@ -177,6 +226,20 @@ def handle_invoice_payment_cancel(invoice_id):
                 "message": "Invoice not found"
             }), 404
         
+        try:
+            NotificationService.create_notification(
+                user_id=invoice.user_id,
+                title="Invoice payment canceled",
+                message=f"Payment for invoice {invoice.invoice_number or invoice.id} was canceled.",
+                category='transaction',
+                priority='medium',
+                metadata={
+                    "invoice_id": str(invoice.id)
+                }
+            )
+        except Exception as notify_err:
+            logger.warning(f"Invoice payment cancel notification failed: {notify_err}")
+
         return jsonify({
             "status": 200,
             "message": "Payment was canceled",
