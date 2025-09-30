@@ -18,6 +18,7 @@
 - [Setup](#-setup)
 - [Running the Application](#-running-the-application)
 - [Live Demo](#-live-demo)
+- [Docker](#-docker)
 - [Environment Variables](#-environment-variables)
 - [Database Migrations](#-database-migrations)
 - [API Documentation](#-api-documentation)
@@ -131,6 +132,24 @@ Application default URL: `http://127.0.0.1:5000`
 - **Swagger Docs**: https://swipe-bczl.onrender.com/docs
 
 This Render deployment mirrors the configuration described above and provides quick access to the marketing site and interactive API documentation.
+
+---
+
+## 🐳 Docker
+
+- **Build & Run**
+  ```bash
+  docker compose up --build
+  ```
+
+- **Teardown**
+  ```bash
+  docker compose down
+  ```
+
+The Compose setup runs a single container (`swipe-web`) using SQLite for storage. On boot, `docker-entrypoint.sh` loads `.env`, applies `flask db upgrade`, and then launches the server via `run.py`.
+
+> **Tip:** SQLite stores its database file inside the mounted project directory (default `swipe.db`). If you need a clean start, remove that file before restarting the container. To switch to Postgres later, add a database service to `docker-compose.yml` and set `DATABASE_URL` accordingly before `docker compose up`.
 
 ---
 
