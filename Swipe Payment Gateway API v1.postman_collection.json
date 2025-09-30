@@ -1,0 +1,5800 @@
+{
+	"info": {
+		"_postman_id": "c425c81c-b1bc-40ca-aabe-f48373d44d57",
+		"name": "Swipe Payment Gateway API v1",
+		"description": "Complete API collection for testing Swipe payment gateway integration with virtual cards, wallet funding, and account management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18352130"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.data.token);",
+									"    pm.environment.set('user_id', response.data.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"d_pardon@live.com\",\n    \"password\": \"SecurePassword123!\",\n    \"phone\": \"+1234567890\",\n    \"accountType\": \"freelancer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Register User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"phone\": \"+1234567890\",\n    \"accountType\": \"freelancer\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 17:48:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "803"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1NzY5OTI4NiwianRpIjoiNjFkMGM4OTgtY2Q2MC00YWRlLWI5YjktMjJjNGM3MThkNjAxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjFiMjFiODg2LTFiMjgtNDc0YS1iYjcyLTg2NjI5ZjZlZGQ0ZiIsIm5iZiI6MTc1NzY5OTI4NiwiY3NyZiI6Ijc4MTE5ODdkLTVmMjEtNDU2Yi1iNTM1LTgxMTViZTI4YmIyNyIsImV4cCI6MTc1Nzc4NTY4Niwicm9sZSI6InVzZXIifQ.Mm0K15dcoEfg_UItG2Zx1f8ztMxjDZx3B6n1YAjXa-0\",\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"User created successfully\",\n    \"status\": 201\n}"
+						},
+						{
+							"name": "Success - Register User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"d_pardon@live.com\",\n    \"password\": \"SecurePassword123!\",\n    \"phone\": \"+1234567890\",\n    \"accountType\": \"freelancer\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:31:37 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "513"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"email_verification_required\": true,\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"d_pardon@live.com\",\n            \"email_verified\": false,\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"User created successfully. Please check your email to verify your account.\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.data.token);",
+									"    pm.environment.set('user_id', response.data.user.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"d_pardon@live.com\",\n    \"password\": \"SecurePassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 17:50:35 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "794"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1NzY5OTQzNSwianRpIjoiNjkxZTM4MDEtYjIxOC00ZjNiLTk3NDQtZmY4YzVhYjY2ZTYwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjFiMjFiODg2LTFiMjgtNDc0YS1iYjcyLTg2NjI5ZjZlZGQ0ZiIsIm5iZiI6MTc1NzY5OTQzNSwiY3NyZiI6IjBiOGY5YzI1LWI1OTktNGIzMi1hYzk2LThlYjhhNTgyYzhlMiIsImV4cCI6MTc1Nzc4NTgzNSwicm9sZSI6InVzZXIifQ._YbMO6M2ndNMjyMjxN4egOqJqIoBDcA1hz0xl83kjps\",\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"Login successful\",\n    \"status\": 200\n}"
+						},
+						{
+							"name": "Success - Login User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"d_pardon@live.com\",\n    \"password\": \"SecurePassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:39:21 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "821"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1OTI1Mzk2MSwianRpIjoiODUzZDlmMDgtZjU4My00YWJkLTljMDctYzFkYjU3NWQ2NDg2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjY4MjFhNGMxLWM5ZjYtNDBlMS1iNGViLWJkNWI5NjE4OWRiZSIsIm5iZiI6MTc1OTI1Mzk2MSwiY3NyZiI6IjNlMjIyODc5LWRkOGYtNDU4YS05MGExLTIyY2RlZmY2ZDM4ZSIsImV4cCI6MTc1OTM0MDM2MSwicm9sZSI6InVzZXIifQ.1mpiJVVZdC_3ldCOQPUolRMl8Or3OQOeYdsx6ZItSuQ\",\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"d_pardon@live.com\",\n            \"email_verified\": true,\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"Login successful\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-email?token=Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify-email"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Verify Email",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/auth/verify-email?token=Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"verify-email"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:35:54 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "859"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1OTI1Mzc1NCwianRpIjoiNGZlZTU0MmQtZjc5Ny00MGUyLWE3NTgtNTgxMWRmN2ZiNDgxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjY4MjFhNGMxLWM5ZjYtNDBlMS1iNGViLWJkNWI5NjE4OWRiZSIsIm5iZiI6MTc1OTI1Mzc1NCwiY3NyZiI6IjlkMDMyMDY2LWZlNzMtNDZlOS1iNzhiLWRmZTBiN2Q2YWYwYyIsImV4cCI6MTc1OTM0MDE1NCwicm9sZSI6InVzZXIifQ.xzPw1Ekfhmuco4on5ETMqsfXJv7ZILeD6cMZnXofyIU\",\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"d_pardon@live.com\",\n            \"email_verified\": true,\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"Email verified successfully. Welcome to Swipe Payment!\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Resend Email Verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"d_pardon@live.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/resend-verification",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"resend-verification"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Verify Email",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/auth/verify-email?token=Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"verify-email"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "Xn-N8KejoLenZexxatpEhypajwsoWlsfdqq5mbJ6wDs"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:35:54 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "859"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1OTI1Mzc1NCwianRpIjoiNGZlZTU0MmQtZjc5Ny00MGUyLWE3NTgtNTgxMWRmN2ZiNDgxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjY4MjFhNGMxLWM5ZjYtNDBlMS1iNGViLWJkNWI5NjE4OWRiZSIsIm5iZiI6MTc1OTI1Mzc1NCwiY3NyZiI6IjlkMDMyMDY2LWZlNzMtNDZlOS1iNzhiLWRmZTBiN2Q2YWYwYyIsImV4cCI6MTc1OTM0MDE1NCwicm9sZSI6InVzZXIifQ.xzPw1Ekfhmuco4on5ETMqsfXJv7ZILeD6cMZnXofyIU\",\n        \"user\": {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"d_pardon@live.com\",\n            \"email_verified\": true,\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    },\n    \"message\": \"Email verified successfully. Welcome to Swipe Payment!\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Logout",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:41:10 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "60"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Successfully logged out\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Forget Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/forget",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"forget"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change_password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"change_password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Account Management",
+			"item": [
+				{
+					"name": "Create Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('account_id', response.data.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currency\": \"USD\",\n    \"currency_code\": \"USD\",\n    \"account_holder\": \"John Doe\",\n    \"bank_name\": \"Swipe Bank\",\n    \"accountType\": \"checking\",\n    \"address\": \"123 Main St, New York, NY\",\n    \"routing_number\": \"021000021\",\n    \"is_default\": true\n}\n\n// {\n//     \"currency\": \"NGN\",\n//     \"currency_code\": \"NGN\",\n//     \"account_holder\": \"John Doe\",\n//     \"bank_name\": \"GT Bank\",\n//     \"accountType\": \"savings\",\n//     \"address\": \"123 Main St, Abuja, NG\",\n//     \"routing_number\": \"021000021\",\n//     \"is_default\": false\n// }"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Account",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currency\": \"USD\",\n    \"currency_code\": \"USD\",\n    \"account_holder\": \"John Doe\",\n    \"bank_name\": \"Swipe Bank\",\n    \"accountType\": \"checking\",\n    \"address\": \"123 Main St, New York, NY\",\n    \"routing_number\": \"021000021\",\n    \"is_default\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"accounts"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 18:09:40 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "702"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"accountType\": \"checking\",\n        \"account_holder\": \"John Doe\",\n        \"account_number\": \"202550077730804\",\n        \"account_number_masked\": \"****0804\",\n        \"address\": \"123 Main St, New York, NY\",\n        \"balance\": 0,\n        \"bank_name\": \"Swipe Bank\",\n        \"created_at\": \"2025-09-12T18:09:40\",\n        \"currency\": \"USD\",\n        \"currency_code\": \"USD\",\n        \"id\": \"24f590fc-4b6a-4bd2-b0e4-1f8d02f03f91\",\n        \"is_default\": true,\n        \"routing_number\": \"021000021\",\n        \"updated_at\": \"2025-09-12T18:09:40\",\n        \"user\": {\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Account created successfully\",\n    \"status\": 201\n}"
+						},
+						{
+							"name": "Success -  Create Account",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currency\": \"NGN\",\n    \"currency_code\": \"NGN\",\n    \"account_holder\": \"John Doe\",\n    \"bank_name\": \"GT Bank\",\n    \"accountType\": \"savings\",\n    \"address\": \"123 Main St, Abuja, NG\",\n    \"routing_number\": \"021000021\",\n    \"is_default\": false\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"accounts"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:48:24 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "688"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"accountType\": \"savings\",\n        \"account_holder\": \"John Doe\",\n        \"account_number\": \"2025126718\",\n        \"account_number_masked\": \"****6718\",\n        \"address\": \"123 Main St, Abuja, NG\",\n        \"balance\": 0,\n        \"bank_name\": \"GT Bank\",\n        \"created_at\": \"2025-09-30T17:48:24\",\n        \"currency\": \"NGN\",\n        \"currency_code\": \"NGN\",\n        \"id\": \"9518bb2b-bb75-48d2-9d79-0ace10ebaac8\",\n        \"is_default\": false,\n        \"routing_number\": \"021000021\",\n        \"updated_at\": \"2025-09-30T17:48:24\",\n        \"user\": {\n            \"email\": \"d_pardon@live.com\",\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Account created successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Accounts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Accounts",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"accounts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 18:16:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "755"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"accountType\": \"checking\",\n            \"account_holder\": \"John Doe\",\n            \"account_number\": \"202550077730804\",\n            \"account_number_masked\": \"****0804\",\n            \"address\": \"123 Main St, New York, NY\",\n            \"balance\": 0,\n            \"bank_name\": \"Swipe Bank\",\n            \"created_at\": \"2025-09-12T18:09:40\",\n            \"currency\": \"USD\",\n            \"currency_code\": \"USD\",\n            \"id\": \"24f590fc-4b6a-4bd2-b0e4-1f8d02f03f91\",\n            \"is_default\": true,\n            \"routing_number\": \"021000021\",\n            \"updated_at\": \"2025-09-12T18:09:40\",\n            \"user\": {\n                \"email\": \"john.doe@example.com\",\n                \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n                \"name\": \"John Doe\"\n            }\n        }\n    ],\n    \"message\": \"Accounts retrieved successfully\",\n    \"status\": 200\n}"
+						},
+						{
+							"name": "Success - Get All Accounts",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"accounts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 17:49:39 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1404"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"accountType\": \"savings\",\n            \"account_holder\": \"John Doe\",\n            \"account_number\": \"2025126718\",\n            \"account_number_masked\": \"****6718\",\n            \"address\": \"123 Main St, Abuja, NG\",\n            \"balance\": 0,\n            \"bank_name\": \"GT Bank\",\n            \"created_at\": \"2025-09-30T17:48:24\",\n            \"currency\": \"NGN\",\n            \"currency_code\": \"NGN\",\n            \"id\": \"9518bb2b-bb75-48d2-9d79-0ace10ebaac8\",\n            \"is_default\": false,\n            \"routing_number\": \"021000021\",\n            \"updated_at\": \"2025-09-30T17:48:24\",\n            \"user\": {\n                \"email\": \"d_pardon@live.com\",\n                \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n                \"name\": \"John Doe\"\n            }\n        },\n        {\n            \"accountType\": \"checking\",\n            \"account_holder\": \"John Doe\",\n            \"account_number\": \"2025126380\",\n            \"account_number_masked\": \"****6380\",\n            \"address\": \"123 Main St, New York, NY\",\n            \"balance\": 0,\n            \"bank_name\": \"Swipe Bank\",\n            \"created_at\": \"2025-09-30T17:47:29\",\n            \"currency\": \"USD\",\n            \"currency_code\": \"USD\",\n            \"id\": \"1aac4d89-31e5-453c-9283-bbdcef68e964\",\n            \"is_default\": true,\n            \"routing_number\": \"021000021\",\n            \"updated_at\": \"2025-09-30T17:47:29\",\n            \"user\": {\n                \"email\": \"d_pardon@live.com\",\n                \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n                \"name\": \"John Doe\"\n            }\n        }\n    ],\n    \"message\": \"Accounts retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Default Account Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/wallets/balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"balance"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Account Balance",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/wallets/balance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"wallets",
+										"balance"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 18:16:59 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "142"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"balance\": 0,\n        \"currency\": \"USD\"\n    },\n    \"message\": \"Default account balance retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Balances",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/balances",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"balances"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Balances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/balances",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"balances"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Sep 2025 18:17:27 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "149"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"currency\": \"USD\",\n        \"total\": \"0.0\",\n        \"usd\": \"0.0\"\n    },\n    \"message\": \"All balances retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Close Account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_id\": \"{{account_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/close",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"close"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Close Account",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\": \"{{account_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/account/close",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"account",
+										"close"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 11:42:00 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "64"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Account closed successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"account_holder\": \"Jane Doe\",\n  \"bank_name\": \"Swipe Digital Bank\",\n  \"accountType\": \"checking\",\n  \"currency\": \"USD\",\n  \"currency_code\": \"USD\",\n  \"routing_number\": \"110000000\",\n  \"address\": \"123 Market St, San Francisco, CA\",\n  \"is_default\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/accounts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Virtual Cards",
+			"item": [
+				{
+					"name": "Create Virtual Card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('card_id', response.data.id);",
+									"    pm.environment.set('stripe_payment_method_id', response.data.stripe_payment_method_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_id\": \"{{account_id}}\",\n    \"card_kind\": \"virtual\",\n    \"card_type\": \"debit\",\n    \"spending_limit\": 1000.00,\n    \"pin\": \"1234\",\n    \"is_default\": true,\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Virtual Card",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\": \"{{account_id}}\",\n    \"card_kind\": \"virtual\",\n    \"card_type\": \"debit\",\n    \"spending_limit\": 1000.00,\n    \"pin\": \"1234\",\n    \"is_default\": true,\n    \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/card",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 12:03:11 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "708"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"account\": {\n            \"account_number\": \"2025007927\",\n            \"bank_name\": \"Swipe Bank\",\n            \"id\": \"37703db6-4dc4-4749-a86a-e1dc6c50669f\"\n        },\n        \"card_holder\": \"John Doe\",\n        \"card_kind\": \"virtual\",\n        \"card_number\": \"5432 **** **** 0346\",\n        \"card_type\": \"debit\",\n        \"created_at\": \"2025-09-14T12:03:11\",\n        \"cvv\": \"573\",\n        \"expiration_date\": \"09/2028\",\n        \"id\": \"710fd498-e557-43d8-bfba-9b319b9f2911\",\n        \"is_active\": true,\n        \"is_default\": true,\n        \"spending_limit\": 1000,\n        \"user\": {\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Card created successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Cards",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cards?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cards"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Cards",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/cards?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cards"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 11:58:16 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "765"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"account\": {\n                \"account_number\": \"2025007927\",\n                \"bank_name\": \"Swipe Bank\",\n                \"id\": \"37703db6-4dc4-4749-a86a-e1dc6c50669f\"\n            },\n            \"card_holder\": \"John Doe\",\n            \"card_kind\": \"virtual\",\n            \"card_number\": \"5432 **** **** 7370\",\n            \"card_type\": \"debit\",\n            \"created_at\": \"2025-09-14T11:58:09\",\n            \"cvv\": \"434\",\n            \"expiration_date\": \"09/2028\",\n            \"id\": \"c7aa3ee0-de7d-49a5-80c4-31a941487e20\",\n            \"is_active\": true,\n            \"is_default\": true,\n            \"spending_limit\": 1000,\n            \"user\": {\n                \"email\": \"john.doe@example.com\",\n                \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n                \"name\": \"John Doe\"\n            }\n        }\n    ],\n    \"message\": \"Cards retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Specific Card",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Specific Card",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 11:58:27 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "710"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"account\": {\n            \"account_number\": \"2025007927\",\n            \"bank_name\": \"Swipe Bank\",\n            \"id\": \"37703db6-4dc4-4749-a86a-e1dc6c50669f\"\n        },\n        \"card_holder\": \"John Doe\",\n        \"card_kind\": \"virtual\",\n        \"card_number\": \"5432 **** **** 7370\",\n        \"card_type\": \"debit\",\n        \"created_at\": \"2025-09-14T11:58:09\",\n        \"cvv\": \"434\",\n        \"expiration_date\": \"09/2028\",\n        \"id\": \"c7aa3ee0-de7d-49a5-80c4-31a941487e20\",\n        \"is_active\": true,\n        \"is_default\": true,\n        \"spending_limit\": 1000,\n        \"user\": {\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Card retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Reveal Card Number (PIN Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pin\": \"1234\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}/reveal",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}",
+								"reveal"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Reveal Card Number (PIN Required)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"1234\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}/reveal",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}",
+										"reveal"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 11:58:44 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "239"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"card_holder\": \"John Doe\",\n        \"card_id\": \"c7aa3ee0-de7d-49a5-80c4-31a941487e20\",\n        \"card_number\": \"5432007370\",\n        \"expiration_date\": \"09/2028\"\n    },\n    \"message\": \"Card number revealed successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Deactivate Card",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}",
+								"deactivate"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Deactivate Card",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}/deactivate",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}",
+										"deactivate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 12:02:31 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "713"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"account\": {\n            \"account_number\": \"2025007927\",\n            \"bank_name\": \"Swipe Bank\",\n            \"id\": \"37703db6-4dc4-4749-a86a-e1dc6c50669f\"\n        },\n        \"card_holder\": \"John Doe\",\n        \"card_kind\": \"virtual\",\n        \"card_number\": \"5432 **** **** 7370\",\n        \"card_type\": \"debit\",\n        \"created_at\": \"2025-09-14T11:58:09\",\n        \"cvv\": \"434\",\n        \"expiration_date\": \"09/2028\",\n        \"id\": \"c7aa3ee0-de7d-49a5-80c4-31a941487e20\",\n        \"is_active\": false,\n        \"is_default\": true,\n        \"spending_limit\": 1000,\n        \"user\": {\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"1b21b886-1b28-474a-bb72-86629f6edd4f\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Card deactivated successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Card",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete Card",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 12:02:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Card deleted successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Pin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_pin\": \"1234\",\n    \"pin\": 3782\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}/change-pin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}",
+								"change-pin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Change Pin",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"current_pin\": 1234,\n    \"pin\": 3782\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}/change-pin",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}",
+										"change-pin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 14 Sep 2025 12:12:32 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "66"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Card PIN changed successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Link Payment Method to Card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('linked_payment_method_id', response.data.stripe_payment_method_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stripe_payment_method_id\": \"pm_1S8M2cFS3RzONqngxxR7keRB\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}/link-payment-method",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}",
+								"link-payment-method"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Link Payment Method to Card",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"stripe_payment_method_id\": \"pm_1S8M2cFS3RzONqngxxR7keRB\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}/link-payment-method",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}",
+										"link-payment-method"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 18:14:38 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "711"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"account\": {\n            \"account_number\": \"2025126718\",\n            \"bank_name\": \"GT Bank\",\n            \"id\": \"9518bb2b-bb75-48d2-9d79-0ace10ebaac8\"\n        },\n        \"card_holder\": \"John Doe\",\n        \"card_kind\": \"virtual\",\n        \"card_number\": \"5432 **** **** 1863\",\n        \"card_type\": \"debit\",\n        \"created_at\": \"2025-09-30T17:56:03\",\n        \"cvv\": \"972\",\n        \"expiration_date\": \"09/2028\",\n        \"id\": \"dc188b50-4602-4c02-b019-ac6f01e3e99a\",\n        \"is_active\": true,\n        \"is_default\": true,\n        \"spending_limit\": 1000,\n        \"user\": {\n            \"email\": \"d_pardon@live.com\",\n            \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n            \"name\": \"John Doe\"\n        }\n    },\n    \"message\": \"Payment method linked successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Card Payment Method",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/card/{{card_id}}/payment-method",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"card",
+								"{{card_id}}",
+								"payment-method"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Card Payment Method",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/card/{{card_id}}/payment-method",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"card",
+										"{{card_id}}",
+										"payment-method"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 18:21:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "366"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"card_id\": \"dc188b50-4602-4c02-b019-ac6f01e3e99a\",\n        \"linked\": true,\n        \"payment_method\": {\n            \"id\": \"pm_1S8M2cFS3RzONqngxxR7keRB\",\n            \"linked\": true,\n            \"stripe_lookup_error\": \"'NoneType' object has no attribute 'Secret'\",\n            \"type\": \"unknown\"\n        }\n    },\n    \"message\": \"Card payment method retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Available Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/payment-methods/available",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payment-methods",
+								"available"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Available Payment Methods",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/payment-methods/available",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"payment-methods",
+										"available"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 18:15:41 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1577"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"payment_methods\": [\n            {\n                \"description\": \"Visa, Mastercard, American Express, and other card networks\",\n                \"fees\": \"2.9% + 30¢ per transaction\",\n                \"name\": \"Credit/Debit Card\",\n                \"supported_countries\": [\n                    \"US\",\n                    \"CA\",\n                    \"GB\",\n                    \"EU\",\n                    \"AU\"\n                ],\n                \"type\": \"card\"\n            },\n            {\n                \"description\": \"Direct bank account transfers via ACH\",\n                \"fees\": \"0.8% per transaction (capped at $5)\",\n                \"name\": \"US Bank Account (ACH)\",\n                \"supported_countries\": [\n                    \"US\"\n                ],\n                \"type\": \"us_bank_account\"\n            },\n            {\n                \"description\": \"European bank account transfers\",\n                \"fees\": \"0.8% per transaction\",\n                \"name\": \"SEPA Direct Debit\",\n                \"supported_countries\": [\n                    \"EU\"\n                ],\n                \"type\": \"sepa_debit\"\n            },\n            {\n                \"description\": \"Buy now, pay later with Klarna\",\n                \"fees\": \"3.5% + 30¢ per transaction\",\n                \"name\": \"Klarna\",\n                \"supported_countries\": [\n                    \"US\",\n                    \"GB\",\n                    \"EU\",\n                    \"AU\"\n                ],\n                \"type\": \"klarna\"\n            },\n            {\n                \"description\": \"Buy now, pay later in 4 installments\",\n                \"fees\": \"4% + 30¢ per transaction\",\n                \"name\": \"Afterpay/Clearpay\",\n                \"supported_countries\": [\n                    \"US\",\n                    \"GB\",\n                    \"AU\"\n                ],\n                \"type\": \"afterpay_clearpay\"\n            }\n        ],\n        \"total_count\": 5\n    },\n    \"message\": \"Available payment methods retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Card Payments",
+			"item": [
+				{
+					"name": "Fund Wallet with Card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('payment_intent_id', response.payment_intent.id);",
+									"    pm.environment.set('client_secret', response.client_secret);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.00,\n    \"currency\": \"USD\",\n    \"description\": \"Test wallet funding via virtual card\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cards/{{card_id}}/fund-wallet",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cards",
+								"{{card_id}}",
+								"fund-wallet"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Fund Wallet with Card",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 100.00,\n    \"currency\": \"USD\",\n    \"description\": \"Test wallet funding via virtual card\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cards/{{card_id}}/fund-wallet",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cards",
+										"{{card_id}}",
+										"fund-wallet"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 17 Sep 2025 12:14:22 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1077"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"client_secret\": \"pi_mock_710fd498-e557-43d8-bfba-9b319b9f2911_10000_1758111262346_secret_mock\",\n    \"message\": \"Wallet funding initiated successfully\",\n    \"payment_intent\": {\n        \"account\": {\n            \"account_number_masked\": \"****7927\",\n            \"currency\": \"USD\",\n            \"id\": \"37703db6-4dc4-4749-a86a-e1dc6c50669f\"\n        },\n        \"amount\": \"100.00\",\n        \"client_secret\": \"pi_mock_710fd498-e557-43d8-bfba-9b319b9f2911_10000_1758111262346_secret_mock\",\n        \"created_at\": \"2025-09-17T12:14:22\",\n        \"currency\": \"USD\",\n        \"description\": \"Test wallet funding via virtual card\",\n        \"gateway_intent_id\": \"pi_mock_710fd498-e557-43d8-bfba-9b319b9f2911_10000_1758111262346\",\n        \"id\": \"32b5859f-0a19-4b12-bebb-1ebe1a535a1c\",\n        \"intent_type\": \"card_funding\",\n        \"meta_data\": null,\n        \"payment_method_id\": \"pm_1234567890abcdef\",\n        \"payment_method_type\": \"card\",\n        \"status\": \"succeeded\",\n        \"updated_at\": \"2025-09-17T12:14:22\",\n        \"virtual_card\": {\n            \"card_number\": \"5432 **** **** 0346\",\n            \"card_type\": \"debit\",\n            \"id\": \"710fd498-e557-43d8-bfba-9b319b9f2911\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Card Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cards/{{card_id}}/transactions?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cards",
+								"{{card_id}}",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Card Transactions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/cards/{{card_id}}/transactions?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cards",
+										"{{card_id}}",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 17 Sep 2025 12:35:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "3194"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"pagination\": {\n            \"page\": 1,\n            \"pages\": 1,\n            \"size\": 10,\n            \"total\": 10\n        },\n        \"transactions\": [\n            {\n                \"amount\": \"25.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T12:17:13\",\n                \"currency\": \"USD\",\n                \"description\": \"Test security fix\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"c6fb4a5a-4626-42a3-992a-9fdd5680145e\"\n            },\n            {\n                \"amount\": \"100.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T12:14:22\",\n                \"currency\": \"USD\",\n                \"description\": \"Test wallet funding via virtual card\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"32b5859f-0a19-4b12-bebb-1ebe1a535a1c\"\n            },\n            {\n                \"amount\": \"50.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:15:59\",\n                \"currency\": \"USD\",\n                \"description\": \"Final confirmation test\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"b8cd26cf-5d09-4c8d-bfc2-19aa9bea3612\"\n            },\n            {\n                \"amount\": \"150.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:14:48\",\n                \"currency\": \"USD\",\n                \"description\": \"Test direct balance update\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"7e95f974-0775-42d5-9b80-5fc6b05bb432\"\n            },\n            {\n                \"amount\": \"10.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:14:14\",\n                \"currency\": \"USD\",\n                \"description\": \"Final test with logs\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"7cb54ff5-f8a2-45bb-8276-4826dad8dd45\"\n            },\n            {\n                \"amount\": \"75.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:13:21\",\n                \"currency\": \"USD\",\n                \"description\": \"Test with debug logging\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"b126d776-7c57-4a53-bd49-c070863054ef\"\n            },\n            {\n                \"amount\": \"25.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:12:38\",\n                \"currency\": \"USD\",\n                \"description\": \"Debug balance update test\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"8485d4d5-92a8-4328-ac9f-479e1307f402\"\n            },\n            {\n                \"amount\": \"50.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:10:36\",\n                \"currency\": \"USD\",\n                \"description\": \"Test wallet funding with balance update\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"30400515-a6e6-483e-80b5-98b0a34debf6\"\n            },\n            {\n                \"amount\": \"100.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-17T11:09:06\",\n                \"currency\": \"USD\",\n                \"description\": \"Test wallet funding via virtual card\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"354d0cd8-754a-489c-a822-399543864506\"\n            },\n            {\n                \"amount\": \"100.00\",\n                \"confirmed_at\": null,\n                \"created_at\": \"2025-09-16T20:16:25\",\n                \"currency\": \"USD\",\n                \"description\": \"Test wallet funding via virtual card\",\n                \"status\": \"succeeded\",\n                \"transaction_id\": \"f230161c-1dcd-48b3-9996-2beb473dbae3\"\n            }\n        ]\n    },\n    \"message\": \"Card transactions retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Card Spending Limit",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"spending_limit\": 2000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cards/{{card_id}}/spending-limit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cards",
+								"{{card_id}}",
+								"spending-limit"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update Card Spending Limit",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"spending_limit\": 2000.00\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cards/{{card_id}}/spending-limit",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cards",
+										"{{card_id}}",
+										"spending-limit"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 17 Sep 2025 12:36:49 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "179"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"card_id\": \"710fd498-e557-43d8-bfba-9b319b9f2911\",\n        \"new_spending_limit\": \"2000.0\"\n    },\n    \"message\": \"Spending limit updated successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Wallet Operations",
+			"item": [
+				{
+					"name": "Fund Wallet (Direct Stripe)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('wallet_payment_intent_id', response.data.payment_intent_id);",
+									"    pm.environment.set('wallet_client_secret', response.data.client_secret);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 50.00,\n    \"currency\": \"USD\",\n    \"account_id\": \"{{account_id}}\",\n    \"description\": \"Direct wallet funding via Stripe\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/wallets/fund",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"fund"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Fund Wallet (Direct Stripe)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 50.00,\n    \"currency\": \"USD\",\n    \"account_id\": \"{{account_id}}\",\n    \"description\": \"Direct wallet funding via Stripe\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/wallets/fund",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"wallets",
+										"fund"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 17 Sep 2025 13:04:58 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "333"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"50.00\",\n        \"client_secret\": \"pi_mock_wallet_1b21b886-1b28-474a-bb72-86629f6edd4f_5000_1758114298655_secret_mock\",\n        \"currency\": \"USD\",\n        \"payment_intent_id\": \"255ab839-c7f9-4f05-9d74-e9397ec48657\",\n        \"status\": \"succeeded\"\n    },\n    \"message\": \"Payment intent created successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Withdraw from Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 25.00,\n    \"currency\": \"USD\",\n    \"account_number\": \"{{account_number}}\", // this or benefifiary id\n    // \"beneficiary_id\": \"test-beneficiary-id\", // optional\n    \"description\": \"Test withdrawal\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/wallets/withdraw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"withdraw"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Withdraw from Wallet",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 25.00,\n    \"currency\": \"USD\",\n    \"account_number\": \"{{account_number}}\", // this or benefifiary id\n    // \"beneficiary_id\": \"test-beneficiary-id\", // optional\n    \"description\": \"Test withdrawal\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/wallets/withdraw",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"wallets",
+										"withdraw"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 19:53:46 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "403"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"25.00\",\n        \"currency\": \"USD\",\n        \"estimated_arrival\": \"2025-09-20\",\n        \"gateway_payout_id\": \"wd_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d_1758225226152\",\n        \"method\": \"standard\",\n        \"payout_id\": \"e286ce40-7b74-448f-8f76-2b7203a67ff0\",\n        \"status\": \"pending\"\n    },\n    \"message\": \"Withdrawal initiated successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Payment Intents",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/wallets/payment-intents?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"payment-intents"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Payment Intents",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/wallets/payment-intents?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"wallets",
+										"payment-intents"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 19:55:08 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1787"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": \"50.00\",\n            \"confirmed_at\": null,\n            \"created_at\": \"2025-09-18T19:24:25\",\n            \"currency\": \"USD\",\n            \"description\": \"Direct wallet funding via Stripe\",\n            \"gateway_intent_id\": \"pi_mock_wallet_3b138875-432d-47ab-a529-d3cda6cb60a1_5000_1758223465968\",\n            \"intent_type\": \"wallet_funding\",\n            \"payment_intent_id\": \"6d6096c8-ea37-443b-8bfd-d4ee57804de6\",\n            \"status\": \"succeeded\"\n        },\n        {\n            \"amount\": \"100.00\",\n            \"confirmed_at\": null,\n            \"created_at\": \"2025-09-18T19:23:43\",\n            \"currency\": \"USD\",\n            \"description\": \"Test wallet funding via virtual card\",\n            \"gateway_intent_id\": \"pi_mock_1c4fef36-185e-4f76-9959-ea8f48ec7643_10000_1758223423339\",\n            \"intent_type\": \"card_funding\",\n            \"payment_intent_id\": \"84560e3a-bd2e-4ac4-8cb1-fcc7458fc72a\",\n            \"status\": \"succeeded\"\n        },\n        {\n            \"amount\": \"50.00\",\n            \"confirmed_at\": null,\n            \"created_at\": \"2025-09-17T14:16:05\",\n            \"currency\": \"USD\",\n            \"description\": \"Test wallet funding with linked card\",\n            \"gateway_intent_id\": \"pi_mock_1c4fef36-185e-4f76-9959-ea8f48ec7643_5000_1758118565724\",\n            \"intent_type\": \"card_funding\",\n            \"payment_intent_id\": \"61341418-492d-4e74-9dd8-5e4777940606\",\n            \"status\": \"succeeded\"\n        },\n        {\n            \"amount\": \"50.00\",\n            \"confirmed_at\": null,\n            \"created_at\": \"2025-09-17T13:42:17\",\n            \"currency\": \"USD\",\n            \"description\": \"Direct wallet funding via Stripe\",\n            \"gateway_intent_id\": \"pi_mock_wallet_3b138875-432d-47ab-a529-d3cda6cb60a1_5000_1758116537693\",\n            \"intent_type\": \"wallet_funding\",\n            \"payment_intent_id\": \"8d9cdcb2-52cd-4113-b394-60827898449a\",\n            \"status\": \"succeeded\"\n        }\n    ],\n    \"message\": \"Payment intents retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Payouts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/wallets/payouts?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"payouts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Payouts",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/wallets/payouts?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"wallets",
+										"payouts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 19:55:24 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2294"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": \"25.00\",\n            \"created_at\": \"2025-09-18T19:53:46\",\n            \"currency\": \"USD\",\n            \"estimated_arrival\": \"2025-09-20\",\n            \"failure_message\": null,\n            \"gateway_payout_id\": \"wd_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d_1758225226152\",\n            \"method\": \"standard\",\n            \"payout_id\": \"e286ce40-7b74-448f-8f76-2b7203a67ff0\",\n            \"processed_at\": null,\n            \"status\": \"pending\"\n        },\n        {\n            \"amount\": \"10.00\",\n            \"created_at\": \"2025-09-18T19:51:01\",\n            \"currency\": \"USD\",\n            \"estimated_arrival\": \"2025-09-20\",\n            \"failure_message\": null,\n            \"gateway_payout_id\": \"po_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d_1758225061190\",\n            \"method\": \"standard\",\n            \"payout_id\": \"ef5d143d-03b5-4e2e-b133-29f904d9f04c\",\n            \"processed_at\": null,\n            \"status\": \"pending\"\n        },\n        {\n            \"amount\": \"20.00\",\n            \"created_at\": \"2025-09-18T19:50:46\",\n            \"currency\": \"USD\",\n            \"estimated_arrival\": \"2025-09-20\",\n            \"failure_message\": null,\n            \"gateway_payout_id\": \"wd_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d_1758225046705\",\n            \"method\": \"standard\",\n            \"payout_id\": \"9c71a4fc-1ffa-4913-8869-b178bc112f6e\",\n            \"processed_at\": null,\n            \"status\": \"pending\"\n        },\n        {\n            \"amount\": \"15.00\",\n            \"created_at\": \"2025-09-18T19:46:52\",\n            \"currency\": \"USD\",\n            \"estimated_arrival\": \"2025-09-20\",\n            \"failure_message\": null,\n            \"gateway_payout_id\": \"po_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d_1758224812132\",\n            \"method\": \"standard\",\n            \"payout_id\": \"fdedc677-2bc5-4159-ba9b-6772f211437c\",\n            \"processed_at\": null,\n            \"status\": \"pending\"\n        },\n        {\n            \"amount\": \"25.00\",\n            \"created_at\": \"2025-09-18T19:31:18\",\n            \"currency\": \"USD\",\n            \"estimated_arrival\": \"2025-09-20\",\n            \"failure_message\": null,\n            \"gateway_payout_id\": \"po_mock_3b138875-432d-47ab-a529-d3cda6cb60a1_bc7806d2-a4a0-4933-addf-907871a3013d\",\n            \"method\": \"standard\",\n            \"payout_id\": \"35b546d3-2dbe-44c1-888b-7ee59a61b8ba\",\n            \"processed_at\": null,\n            \"status\": \"pending\"\n        }\n    ],\n    \"message\": \"Payouts retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Confirm Payment Intent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_intent_id\": \"{{payment_intent_id}}\",\n    \"payment_method_id\": \"{{stripe_payment_method_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/wallets/confirm-payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallets",
+								"confirm-payment"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Two-Factor Authentication (2FA)",
+			"item": [
+				{
+					"name": "Setup 2FA",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('qr_code', response.data.qr_code);",
+									"    pm.environment.set('secret_key', response.data.secret_key);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/2fa/setup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"2fa",
+								"setup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Setup 2FA",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/2fa/setup",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"2fa",
+										"setup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Sep 2025 19:07:37 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1845"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"manual_entry_key\": \"MHDVKWL3HR7FFOAJVZ4P3L3UGFBECQ5L\",\n        \"qr_code\": \"iVBORw0KGgoAAAANSUhEUgAAAiYAAAImAQAAAABPtXzrAAAElElEQVR4nO2dUY6cMAyG/zRI+xhusEeBq/VIvQEcpQdYKTyOBHIfYidmdttu1R2Fdv88jAYIn0CyLPu3E4Lg78fx5QMgACmkkEIKKaSQQgoppJBCCiknyhp0AFsIwDYgzPXCDADYQgghDMA6HjZ9fMCzkELK+4aIiMiSRERkh/7LACYRwZRP8yRHwST73W1XeiNSPh3lqF70CACiqAdOaqIhjG0KikN+1LOQQso7xvDqzDYgIO0QoGq/WygXyol1fHnIs5BCyl9RphxFJB8hzNuAEtXOSdSMT9724c9CCim/GvfxbolocxQAUS8siAIkEbVsxrukXIBiRlgPl7S/50cHbZeUbhTTD+pYEMuf4mhhfleWpLLD/R20XVK6UH6mkWngYA45Ft1MRHa7LaPIaLRdUvpQqu1qCGuOFgDSDnO+1ahLSAy9QNslpR/lbLu7ViR0WB1iSbsrVZgHpu2S0pVSczWvJJQrZpioKRk08m13M1cjpRvF+V2r/0b1p05TsBjY5sWqltF2SelF8X63JWfF5WbL0KrO0Ca3AIO2S0ofCu7NETUqaG04xQPD/C6S1jDod0npSHFqLaoU5gLcaqIWKQAqQFiETNslpQ/lpDNkQEUxAC22bX7Xuh3MbFkTJqUfxfXlvnK+rZommsmZ2GAxMGMGUvpRTrlajXerPau+i2a2tfc8M2YgpSvF52rasVAVh+SjXJOAd7PixNoEKV0pXt/V4W3XVYedAZdzLcuj7ZLSgeJ7cWqvrm/itXNl8lI7GxY0jYK2S0pHyhZCmMtStSMA6VZ+ZCmHGuCGeRtgU3aE+SHPQgop7xm6Xm3KI1AkW8Q9IL1A1rK6JwqwDXtAugVM30YEpHIOso75A5+FFFL+aDiNbKknp9yEMkB7IK3Rwc4xVyOlK8Wt+SnSgSv4Zpszie3U0GJgyZG1CVJ6UnxNWPcMqZqC5W82NboudLR+M9ouKV0oTStAs9NWIvYVNsALZdrZQNslpRfltFdTBlzkW4IEiyha0cJVLmi7pPSjqM6wzhEoEgMigJQR1hGQdXwZBIg7gJuqZevzjjB9H1o540pvRMpnoZzW/OCUsPn1Pb5xzAW9jHdJ6UfxOoMLHKwDpwxN3czPTrZYmDoDKR0pJ323ZWi2whKoJWLgHBLbqnjaLil9KCeNzBlwXd/TpLAMS9hkd7fRdknpTpGvz7ey5TkAIMyAW7QWZkTBOgLA9iTcf5eU3pQaMwB3W+JIbTbXkNiWWTJXI+USFNcD6dWF5LUHuwDnhtm/S0pvytv7QLol76aMtZ2crFjsNsy50huR8sko7Ts/k2gJIoTwJCi9utsArM9ih+WnVYyv+EakfBqKOlDY56mOmohFKa3oUz5qJqf9u5q6XfONSPnfKaf1aqmu/y0jvpm66UXmaqRcjnIEU3pv+pmUKUcpnwUso25EQr9LSj/Km37XNl/welgrWrhtTpmrkdKP8sZ3fqwhp3UxtK9M1M0gT1+eoO2S0oHy+js/rYGhRrRtqVrd5pS1CVJ6U4L8fs5vx3GlNyKFFFJIIYUUUkghhRRSSPn3KT8A0sH6rGizel0AAAAASUVORK5CYII=\",\n        \"secret_key\": \"MHDVKWL3HR7FFOAJVZ4P3L3UGFBECQ5L\"\n    },\n    \"message\": \"2FA setup initiated\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify 2FA Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('backup_codes', JSON.stringify(response.data.backup_codes));",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"393138\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/2fa/verify",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"2fa",
+								"verify"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Verify 2FA Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"393138\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/2fa/verify",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"2fa",
+										"verify"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Sep 2025 19:12:04 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "249"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"backup_codes\": [\n            \"07805843\",\n            \"04005346\",\n            \"04773862\",\n            \"62878773\",\n            \"70329448\",\n            \"76514990\",\n            \"52322027\",\n            \"97006706\"\n        ]\n    },\n    \"message\": \"2FA enabled successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get 2FA Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/2fa/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"2fa",
+								"status"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get 2FA Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/2fa/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"2fa",
+										"status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Sep 2025 19:13:36 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "90"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"backup_codes_remaining\": 8,\n        \"enabled\": true\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Disable 2FA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"SecurePassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/2fa/disable",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"2fa",
+								"disable"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Disable 2FA",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"SecurePassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/2fa/disable",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"2fa",
+										"disable"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Sep 2025 19:13:59 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"2FA disabled successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Regenerate Backup Codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('backup_codes', JSON.stringify(response.data.backup_codes));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"SecurePassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/2fa/backup-codes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"2fa",
+								"backup-codes"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Regenerate Backup Codes",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"SecurePassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/2fa/backup-codes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"2fa",
+										"backup-codes"
+									]
+								}
+							},
+							"status": "BAD REQUEST",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Sep 2025 19:14:23 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "55"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"2FA is not enabled\",\n    \"status\": 400\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 19:55:59 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "390"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"accountType\": \"freelancer\",\n            \"address\": null,\n            \"city\": null,\n            \"country\": null,\n            \"countryCode\": null,\n            \"email\": \"john.doe@example.com\",\n            \"id\": \"3b138875-432d-47ab-a529-d3cda6cb60a1\",\n            \"name\": \"John Doe\",\n            \"phone\": \"+1234567890\",\n            \"role\": \"user\"\n        }\n    ],\n    \"message\": \"Users retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Current User",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 19:56:08 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "357"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"accountType\": \"freelancer\",\n        \"address\": null,\n        \"city\": null,\n        \"country\": null,\n        \"countryCode\": null,\n        \"email\": \"john.doe@example.com\",\n        \"id\": \"3b138875-432d-47ab-a529-d3cda6cb60a1\",\n        \"name\": \"John Doe\",\n        \"phone\": \"+1234567890\",\n        \"role\": \"user\"\n    },\n    \"message\": \"user retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"phone\": \"+1234567891\",\n    \"address\": \"456 Updated St, New York, NY\",\n    \"city\": \"New York\",\n    \"country\": \"United States\",\n    \"countryCode\": \"US\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update User",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Updated\",\n    \"phone\": \"+1234567891\",\n    \"address\": \"456 Updated St, New York, NY\",\n    \"city\": \"New York\",\n    \"country\": \"United States\",\n    \"countryCode\": \"US\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 Sep 2025 20:01:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "402"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"accountType\": \"freelancer\",\n        \"address\": \"456 Updated St, New York, NY\",\n        \"city\": \"New York\",\n        \"country\": \"United States\",\n        \"countryCode\": \"US\",\n        \"email\": \"john.doe@example.com\",\n        \"id\": \"3b138875-432d-47ab-a529-d3cda6cb60a1\",\n        \"name\": \"John Updated\",\n        \"phone\": \"+1234567891\",\n        \"role\": \"user\"\n    },\n    \"message\": \"User updated successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoice Management",
+			"item": [
+				{
+					"name": "Create Invoice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('invoice_id', response.data.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//     \"title\": \"Web Development Services\",\n//     \"description\": \"Frontend and backend development for e-commerce platform\",\n//     \"client_name\": \"ABC Corporation\",\n//     \"client_email\": \"billing@abccorp.com\",\n//     \"amount\": 2500.00,\n//     \"currency\": \"USD\",\n//     \"tax_amount\": 250.00,\n//     \"discount_amount\": 0.00,\n//     \"due_date\": \"2024-01-15\",\n//     \"notes\": \"Payment due within 30 days\",\n//     \"status\": \"draft\"\n// }\n\n{\n  \"title\": \"Website build\",\n  \"client_name\": \"Acme Ltd\",\n  \"client_email\": \"billing@acme.test\",\n  \"currency\": \"USD\",\n  \"amount\": 1200,\n  \"tax_amount\": 100,\n  \"discount_amount\": 0,\n  \"issue_date\": \"2025-09-30\",\n  \"due_date\": \"2025-10-15\",\n  \"status\": \"pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/invoices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Invoice",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\n//     \"title\": \"Web Development Services\",\n//     \"description\": \"Frontend and backend development for e-commerce platform\",\n//     \"client_name\": \"ABC Corporation\",\n//     \"client_email\": \"billing@abccorp.com\",\n//     \"amount\": 2500.00,\n//     \"currency\": \"USD\",\n//     \"tax_amount\": 250.00,\n//     \"discount_amount\": 0.00,\n//     \"due_date\": \"2024-01-15\",\n//     \"notes\": \"Payment due within 30 days\",\n//     \"status\": \"draft\"\n// }\n\n{\n  \"title\": \"Website build\",\n  \"client_name\": \"Acme Ltd\",\n  \"client_email\": \"billing@acme.test\",\n  \"currency\": \"USD\",\n  \"amount\": 1200,\n  \"tax_amount\": 100,\n  \"discount_amount\": 0,\n  \"issue_date\": \"2025-09-30\",\n  \"due_date\": \"2025-10-15\",\n  \"status\": \"pending\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/invoices",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:56:45 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "884"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"1200.00\",\n        \"client_address\": null,\n        \"client_email\": \"billing@acme.test\",\n        \"client_name\": \"Acme Ltd\",\n        \"created_at\": \"2025-09-30T19:56:45.841662\",\n        \"currency\": \"USD\",\n        \"description\": null,\n        \"discount_amount\": \"0.00\",\n        \"due_date\": \"2025-10-15T00:00:00\",\n        \"id\": \"dc58df94-231a-4526-a635-b0d1c55dbe75\",\n        \"invoice_number\": \"INV-20250930205645-F404602E\",\n        \"is_due_soon\": false,\n        \"is_overdue\": false,\n        \"issue_date\": \"2025-09-30T00:00:00\",\n        \"notes\": null,\n        \"paid_date\": null,\n        \"payment_link\": null,\n        \"payment_status\": \"unpaid\",\n        \"status\": \"pending\",\n        \"tax_amount\": \"100.00\",\n        \"title\": \"Website build\",\n        \"total_amount\": \"1300.00\",\n        \"updated_at\": \"2025-09-30T19:56:45.841669\",\n        \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n    },\n    \"message\": \"Invoice created successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "sort_order",
+									"value": "desc",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Invoices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "sort_by",
+											"value": "created_at",
+											"disabled": true
+										},
+										{
+											"key": "sort_order",
+											"value": "desc",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:57:39 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1078"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": \"1200.00\",\n            \"client_address\": null,\n            \"client_email\": \"billing@acme.test\",\n            \"client_name\": \"Acme Ltd\",\n            \"created_at\": \"2025-09-30T19:56:45.841662\",\n            \"currency\": \"USD\",\n            \"description\": null,\n            \"discount_amount\": \"0.00\",\n            \"due_date\": \"2025-10-15T00:00:00\",\n            \"id\": \"dc58df94-231a-4526-a635-b0d1c55dbe75\",\n            \"invoice_number\": \"INV-20250930205645-F404602E\",\n            \"is_due_soon\": false,\n            \"is_overdue\": false,\n            \"issue_date\": \"2025-09-30T00:00:00\",\n            \"notes\": null,\n            \"paid_date\": null,\n            \"payment_link\": null,\n            \"payment_status\": \"unpaid\",\n            \"status\": \"pending\",\n            \"tax_amount\": \"100.00\",\n            \"title\": \"Website build\",\n            \"total_amount\": \"1300.00\",\n            \"updated_at\": \"2025-09-30T19:56:45.841669\",\n            \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n        }\n    ],\n    \"message\": \"Invoices retrieved successfully\",\n    \"pagination\": {\n        \"has_next\": false,\n        \"has_prev\": false,\n        \"page\": 1,\n        \"pages\": 1,\n        \"size\": 10,\n        \"total\": 1\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Draft Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/draft?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"draft"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Draft Invoices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/draft?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"draft"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:10:02 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1036"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": \"1200.00\",\n            \"client_address\": null,\n            \"client_email\": \"billing@acme.test\",\n            \"client_name\": \"Acme Ltd\",\n            \"created_at\": \"2025-09-30T20:05:38.704117\",\n            \"currency\": \"USD\",\n            \"description\": null,\n            \"discount_amount\": \"0.00\",\n            \"due_date\": \"2025-10-15T00:00:00\",\n            \"id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n            \"invoice_number\": \"INV-20250930210538-B5266FF0\",\n            \"is_due_soon\": false,\n            \"is_overdue\": false,\n            \"issue_date\": \"2025-09-30T00:00:00\",\n            \"notes\": null,\n            \"paid_date\": null,\n            \"payment_link\": null,\n            \"payment_status\": \"unpaid\",\n            \"status\": \"draft\",\n            \"tax_amount\": \"100.00\",\n            \"title\": \"Website build\",\n            \"total_amount\": \"1300.00\",\n            \"updated_at\": \"2025-09-30T20:05:38.704124\",\n            \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n        }\n    ],\n    \"message\": \"Draft invoices retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 1,\n        \"size\": 10,\n        \"total\": 1\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Pending Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/pending?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"pending"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Pending Invoices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/pending?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"pending"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:10:10 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1040"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": \"1200.00\",\n            \"client_address\": null,\n            \"client_email\": \"billing@acme.test\",\n            \"client_name\": \"Acme Ltd\",\n            \"created_at\": \"2025-09-30T19:56:45.841662\",\n            \"currency\": \"USD\",\n            \"description\": null,\n            \"discount_amount\": \"0.00\",\n            \"due_date\": \"2025-10-15T00:00:00\",\n            \"id\": \"dc58df94-231a-4526-a635-b0d1c55dbe75\",\n            \"invoice_number\": \"INV-20250930205645-F404602E\",\n            \"is_due_soon\": false,\n            \"is_overdue\": false,\n            \"issue_date\": \"2025-09-30T00:00:00\",\n            \"notes\": null,\n            \"paid_date\": null,\n            \"payment_link\": null,\n            \"payment_status\": \"unpaid\",\n            \"status\": \"pending\",\n            \"tax_amount\": \"100.00\",\n            \"title\": \"Website build\",\n            \"total_amount\": \"1300.00\",\n            \"updated_at\": \"2025-09-30T19:56:45.841669\",\n            \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n        }\n    ],\n    \"message\": \"Pending invoices retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 1,\n        \"size\": 10,\n        \"total\": 1\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Due Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/due?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"due"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Due Invoices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/due?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"due"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:10:19 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "171"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [],\n    \"message\": \"Due invoices retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 0,\n        \"size\": 10,\n        \"total\": 0\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Overdue Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/overdue?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"overdue"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Overdue Invoices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/overdue?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"overdue"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:23:17 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "175"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [],\n    \"message\": \"Overdue invoices retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 0,\n        \"size\": 10,\n        \"total\": 0\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Specific Invoice",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Specific Invoice",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/{{invoice_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"{{invoice_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:08:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "884"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"1200.00\",\n        \"client_address\": null,\n        \"client_email\": \"billing@acme.test\",\n        \"client_name\": \"Acme Ltd\",\n        \"created_at\": \"2025-09-30T20:05:38.704117\",\n        \"currency\": \"USD\",\n        \"description\": null,\n        \"discount_amount\": \"0.00\",\n        \"due_date\": \"2025-10-15T00:00:00\",\n        \"id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n        \"invoice_number\": \"INV-20250930210538-B5266FF0\",\n        \"is_due_soon\": false,\n        \"is_overdue\": false,\n        \"issue_date\": \"2025-09-30T00:00:00\",\n        \"notes\": null,\n        \"paid_date\": null,\n        \"payment_link\": null,\n        \"payment_status\": \"unpaid\",\n        \"status\": \"draft\",\n        \"tax_amount\": \"100.00\",\n        \"title\": \"Website build\",\n        \"total_amount\": \"1300.00\",\n        \"updated_at\": \"2025-09-30T20:05:38.704124\",\n        \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n    },\n    \"message\": \"Invoice retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Invoice",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Web Development Services\",\n    \"amount\": 3000.00,\n    \"tax_amount\": 300.00,\n    \"status\": \"pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Invoice",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoice Payments",
+			"item": [
+				{
+					"name": "Create Invoice Payment Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('payment_url', response.data.payment_url);",
+									"    pm.environment.set('invoice_payment_intent_id', response.data.payment_intent_id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"success_url\": \"{{base_url}}/payment/success\",\n    \"cancel_url\": \"{{base_url}}/payment/cancel\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}/pay",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}",
+								"pay"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Invoice Payment Session",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"success_url\": \"{{base_url}}/payment/success\",\n    \"cancel_url\": \"{{base_url}}/payment/cancel\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/invoices/{{invoice_id}}/pay",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"{{invoice_id}}",
+										"pay"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:33:01 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"1200.00\",\n        \"currency\": \"USD\",\n        \"invoice_id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n        \"payment_intent_id\": \"4cd75135-90df-4776-a514-332f4564df00\",\n        \"payment_url\": \"http://127.0.0.1:5000/payment/success?session_id=cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761\"\n    },\n    \"message\": \"Payment session created successfully\",\n    \"status\": 201\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Invoice Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}",
+								"payment-status"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Invoice Payment Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"{{invoice_id}}",
+										"payment-status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:46:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "525"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"confirmed_at\": null,\n        \"created_at\": \"2025-09-30T20:33:01\",\n        \"invoice_amount\": \"1200.00\",\n        \"invoice_currency\": \"USD\",\n        \"invoice_id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n        \"is_successful\": false,\n        \"payment_amount\": \"1200.00\",\n        \"payment_currency\": \"USD\",\n        \"payment_intent_id\": \"4cd75135-90df-4776-a514-332f4564df00\",\n        \"payment_intent_status\": \"requires_payment_method\",\n        \"payment_status\": \"pending\"\n    },\n    \"message\": \"Payment status retrieved successfully\",\n    \"status\": 200\n}"
+						},
+						{
+							"name": "Get Invoice Payment Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"{{invoice_id}}",
+										"payment-status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:52:50 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "531"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"confirmed_at\": \"2025-09-30T20:52:40.546729\",\n        \"created_at\": \"2025-09-30T20:33:01\",\n        \"invoice_amount\": \"1200.00\",\n        \"invoice_currency\": \"USD\",\n        \"invoice_id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n        \"is_successful\": true,\n        \"payment_amount\": \"1200.00\",\n        \"payment_currency\": \"USD\",\n        \"payment_intent_id\": \"4cd75135-90df-4776-a514-332f4564df00\",\n        \"payment_intent_status\": \"succeeded\",\n        \"payment_status\": \"paid\"\n    },\n    \"message\": \"Payment status retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Invoice Payment Link",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('payment_link', response.data.payment_link);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-link",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}",
+								"payment-link"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Invoice Payment Link",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-link",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"invoices",
+										"{{invoice_id}}",
+										"payment-link"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:42:59 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "333"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"amount\": \"1200.00\",\n        \"currency\": \"USD\",\n        \"invoice_id\": \"1f89c298-214f-4542-9a20-b5f77d51e516\",\n        \"payment_link\": \"http://127.0.0.1:5000/payment/success?session_id=cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761\"\n    },\n    \"message\": \"Payment link retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Handle Payment Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-success?session_id={{session_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}",
+								"payment-success"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "{{session_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Handle Payment Cancel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/invoices/{{invoice_id}}/payment-cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"invoices",
+								"{{invoice_id}}",
+								"payment-cancel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pay invoice",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/payment/success?session_id=cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"payment",
+								"success"
+							],
+							"query": [
+								{
+									"key": "session_id",
+									"value": "cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Pay invoice",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5000/payment/success?session_id=cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"payment",
+										"success"
+									],
+									"query": [
+										{
+											"key": "session_id",
+											"value": "cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:40:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1185"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "\n<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>Payment Successful</title>\n        <style>\n        body { font-family: Arial, sans-serif; background: #f7f7fb; color: #1f1f3d; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }\n        .card { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.25); max-width: 560px; text-align: center; }\n        h1 { font-size: 2rem; margin-bottom: 1rem; color: #4f46e5; }\n        p { margin-bottom: 0.75rem; }\n        a { display: inline-block; margin-top: 1.5rem; padding: 0.75rem 1.75rem; border-radius: 999px; background: #4f46e5; color: white; text-decoration: none; font-weight: 600; }\n        a:hover { background: #4338ca; }\n        .meta { font-size: 0.9rem; color: #4b5563; }\n    </style>\n    </head>\n    <body>\n        <section class=\"card\">\n            <h1>Payment Successful</h1>\n            <p>Your invoice payment has been recorded successfully.</p>\n            <p class=\"meta\">Session ID: cs_mock_invoice_1f89c298-214f-4542-9a20-b5f77d51e516_1759264381761</p>\n            <a href=\"/\">Return to Dashboard</a>\n        </section>\n    </body>\n</html>"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Beneficiaries",
+			"item": [
+				{
+					"name": "Create Beneficiary",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"beneficiary_name\": \"Jane Smith\",\n    \"bank_name\": \"Chase Bank\",\n    \"account_number\": \"1234567890\",\n    \"routing_number\": \"021000021\",\n    \"account_type\": \"checking\",\n    \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/{{user_id}}/beneficiaries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"{{user_id}}",
+								"beneficiaries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Beneficiaries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/{{user_id}}/beneficiaries?page=1&size=10&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"{{user_id}}",
+								"beneficiaries"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Beneficiaries",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/user/{{user_id}}/beneficiaries?page=1&size=10&search=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"{{user_id}}",
+										"beneficiaries"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 20:54:36 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "172"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [],\n    \"message\": \"Beneficiaries retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 0,\n        \"size\": 10,\n        \"total\": 0\n    },\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Specific Beneficiary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/{{user_id}}/beneficiaries/{{beneficiary_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"{{user_id}}",
+								"beneficiaries",
+								"{{beneficiary_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Beneficiary",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"beneficiary_name\": \"Jane Updated Smith\",\n    \"bank_name\": \"Updated Bank\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/beneficiary/{{beneficiary_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"beneficiary",
+								"{{beneficiary_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Beneficiary",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/{{user_id}}/beneficiary/{{beneficiary_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"{{user_id}}",
+								"beneficiary",
+								"{{beneficiary_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?page=1&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Transactions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/transactions?page=1&size=10&type=&status=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "type",
+											"value": ""
+										},
+										{
+											"key": "status",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 21:00:34 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "172"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [],\n    \"message\": \"Beneficiaries retrieved successfully\",\n    \"pagination\": {\n        \"page\": 1,\n        \"pages\": 0,\n        \"size\": 10,\n        \"total\": 0\n    },\n    \"status\": 200\n}"
+						},
+						{
+							"name": "Get All Transactions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/transactions?page=1&size=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "type",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 21:24:51 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "854"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"amount\": 50,\n            \"beneficiary\": null,\n            \"created_at\": \"2025-09-30T21:21:42.459361\",\n            \"credit_account\": {\n                \"account_number_masked\": \"****6718\",\n                \"currency_code\": \"NGN\",\n                \"id\": \"9518bb2b-bb75-48d2-9d79-0ace10ebaac8\"\n            },\n            \"currency_code\": \"USD\",\n            \"debit_account\": null,\n            \"description\": \"Direct wallet funding via Stripe\",\n            \"fee\": 0,\n            \"id\": \"1f2278ab-a197-432a-98c7-62788b63faef\",\n            \"metadata\": {\n                \"payment_intent_id\": \"8fa7cc1e-584c-4f7b-ba0e-d1be43838ec4\"\n            },\n            \"status\": \"pending\",\n            \"type\": \"wallet_fund_intent\",\n            \"user\": {\n                \"email\": \"d_pardon@live.com\",\n                \"id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\",\n                \"name\": \"John Doe\"\n            }\n        }\n    ],\n    \"message\": \"Transactions retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notification Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/count",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"count"
+							]
+						},
+						"description": "Returns total and unread counts with category breakdown"
+					},
+					"response": [
+						{
+							"name": "Get Notification Count",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/notifications/count",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"notifications",
+										"count"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:05:19 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "172"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"categories\": {\n            \"system\": 1\n        },\n        \"total\": 1,\n        \"unread\": 1\n    },\n    \"message\": \"Notification count retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "List Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications?page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Paginated list with optional filters"
+					},
+					"response": [
+						{
+							"name": "List Notifications",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/notifications?page=1&limit=20",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"notifications"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:07:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "787"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"notifications\": [\n            {\n                \"category\": \"system\",\n                \"created_at\": \"2025-09-30T17:31:37.758587\",\n                \"id\": \"1344d148-8a27-4d32-964b-f90b6e703341\",\n                \"is_read\": false,\n                \"message\": \"Your account has been created successfully. You can now send and receive payments.\",\n                \"metadata\": null,\n                \"priority\": \"medium\",\n                \"read_at\": null,\n                \"title\": \"Welcome to Swipe Payment!\",\n                \"updated_at\": \"2025-09-30T17:31:37.758595\",\n                \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n            }\n        ],\n        \"pagination\": {\n            \"has_next\": false,\n            \"has_prev\": false,\n            \"limit\": 20,\n            \"page\": 1,\n            \"pages\": 1,\n            \"total\": 1\n        }\n    },\n    \"message\": \"Notifications retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Notification",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/1344d148-8a27-4d32-964b-f90b6e703341",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"1344d148-8a27-4d32-964b-f90b6e703341"
+							]
+						},
+						"description": "Fetch a single notification by ID"
+					},
+					"response": [
+						{
+							"name": "Get Notification",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/notifications/1344d148-8a27-4d32-964b-f90b6e703341",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"notifications",
+										"1344d148-8a27-4d32-964b-f90b6e703341"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:09:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "549"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"category\": \"system\",\n        \"created_at\": \"2025-09-30T17:31:37.758587\",\n        \"id\": \"1344d148-8a27-4d32-964b-f90b6e703341\",\n        \"is_read\": false,\n        \"message\": \"Your account has been created successfully. You can now send and receive payments.\",\n        \"metadata\": null,\n        \"priority\": \"medium\",\n        \"read_at\": null,\n        \"title\": \"Welcome to Swipe Payment!\",\n        \"updated_at\": \"2025-09-30T17:31:37.758595\",\n        \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n    },\n    \"message\": \"Notification retrieved successfully\",\n    \"status\": 200\n}"
+						},
+						{
+							"name": "Get Notification",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/notifications/1344d148-8a27-4d32-964b-f90b6e703341",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"notifications",
+										"1344d148-8a27-4d32-964b-f90b6e703341"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:09:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "549"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"category\": \"system\",\n        \"created_at\": \"2025-09-30T17:31:37.758587\",\n        \"id\": \"1344d148-8a27-4d32-964b-f90b6e703341\",\n        \"is_read\": false,\n        \"message\": \"Your account has been created successfully. You can now send and receive payments.\",\n        \"metadata\": null,\n        \"priority\": \"medium\",\n        \"read_at\": null,\n        \"title\": \"Welcome to Swipe Payment!\",\n        \"updated_at\": \"2025-09-30T17:31:37.758595\",\n        \"user_id\": \"6821a4c1-c9f6-40e1-b4eb-bd5b96189dbe\"\n    },\n    \"message\": \"Notification retrieved successfully\",\n    \"status\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Toggle Read Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"is_read\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications/{{notification_id}}/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"{{notification_id}}",
+								"read"
+							]
+						},
+						"description": "Mark a notification as read/unread"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Toggle Notifications",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notification_ids\": [\"{{notification_id}}\"],\n  \"is_read\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications/bulk/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"bulk",
+								"read"
+							]
+						},
+						"description": "Bulk update read state for multiple IDs"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Notifications",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/clear",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"clear"
+							]
+						},
+						"description": "Delete notifications with optional filters (category, status, older_than ISO timestamp)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/settings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"settings"
+							]
+						},
+						"description": "Retrieve current notification preference settings"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification Settings",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email_security\": true,\n  \"in_app_marketing\": false,\n  \"push_enabled\": true,\n  \"quiet_hours_enabled\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications/settings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"settings"
+							]
+						},
+						"description": "Update notification preferences; send only fields you want to change"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/stats?days=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "30"
+								}
+							]
+						},
+						"description": "Retrieve notification metrics over a time window"
+					},
+					"response": [
+						{
+							"name": "Get Notification Stats",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/notifications/stats?days=30",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"notifications",
+										"stats"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "30"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.13.7"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 30 Sep 2025 19:09:32 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "313"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"avg_response_time_minutes\": null,\n        \"category_breakdown\": {\n            \"system\": 1\n        },\n        \"period_days\": 30,\n        \"read_notifications\": 0,\n        \"read_rate\": 0,\n        \"total_notifications\": 1,\n        \"unread_notifications\": 1\n    },\n    \"message\": \"Notification statistics retrieved\",\n    \"status\": 200\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Exchange Rates",
+			"item": [
+				{
+					"name": "Get Exchange Rates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/rates?base=USD",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"rates"
+							],
+							"query": [
+								{
+									"key": "base",
+									"value": "USD"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Webhooks (Testing)",
+			"item": [
+				{
+					"name": "Stripe Webhook Simulation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Stripe-Signature",
+								"value": "test-signature"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"evt_test_webhook\",\n    \"object\": \"event\",\n    \"type\": \"payment_intent.succeeded\",\n    \"data\": {\n        \"object\": {\n            \"id\": \"{{payment_intent_id}}\",\n            \"status\": \"succeeded\",\n            \"amount\": 10000,\n            \"currency\": \"usd\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/webhooks/stripe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"webhooks",
+								"stripe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000"
+		}
+	]
+}

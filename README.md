@@ -1,175 +1,212 @@
 
 
-# 💳 Swipe — A FinTech API for Transactions, Accounts & Virtual Cards
+# 💳 Swipe — FinTech Payments & Wallet Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-2.x-lightgrey.svg)](https://flask.palletsprojects.com/)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/yourusername/swipe/actions)
-[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/yourusername/swipe/tests)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.x-lightgrey.svg)](https://flask.palletsprojects.com/)
 
-**Swipe** is a scalable, secure, and modern FinTech backend API built with **Flask**. It allows users to create and manage financial transactions and accounts, integrates with external APIs for **real-time currency conversion**, and supports **virtual card generation**.
+**Swipe** is a production-ready backend for digital wallets, card issuing, invoicing, and notifications. The service is built with **Flask**, secured with **JWT**, supports **TOTP 2FA**, integrates **Stripe** for payments, and ships with a polished Swagger UI plus a curated Postman collection.
+
+---
+
+## 📚 Table of Contents
+
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Requirements](#-requirements)
+- [Setup](#-setup)
+- [Running the Application](#-running-the-application)
+- [Live Demo](#-live-demo)
+- [Environment Variables](#-environment-variables)
+- [Database Migrations](#-database-migrations)
+- [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Tooling & Integrations](#-tooling--integrations)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
 
 ---
 
 ## 🚀 Features
 
-* ✅ User registration & authentication (JWT-based)
-* 💰 Create and manage financial **transactions**
-* 🏦 Manage multiple **bank accounts**
-* 🌍 **Real-time currency conversion** (via external APIs like Fixer or OpenExchange)
-* 💳 **Virtual card generation** (with secure tokenization)
-* 📊 Transaction history and analytics
-* 🔐 Secure API design with rate limiting and request validation
+- **Authentication & Security**: JWT auth, password reset emails, and full TOTP-based two-factor authentication with backup codes (`app/routes/auth.py`, `app/routes/two_factor_auth.py`).
+- **Accounts & Wallets**: Multi-currency accounts, balance aggregation, FX rates with margin controls (`app/routes/account.py`).
+- **Virtual Cards & Spending**: Card issuance, card funding, transaction history, Stripe payment method linking, and spending limits (`app/routes/card.py`, `app/routes/card_payments.py`).
+- **Invoices & Payments**: Invoice lifecycle management, Stripe Checkout sessions, hosted payment redirects, and status tracking (`app/routes/invoice.py`, `app/routes/invoice_payments.py`, `app/routes/payment_redirects.py`).
+- **Notifications**: In-app and email notifications, preference management, bulk broadcast tooling, and admin maintenance endpoints (`app/routes/notifications.py`, `app/routes/admin_notifications.py`).
+- **Documentation & Testing Utilities**: Swagger UI served via `app/swagger.py`, Postman collection `Swipe.json`, and scripts for exercising 2FA and webhook flows.
+- **Landing Experience**: Responsive marketing page at the root route highlighting the product (`app/routes/base_route.py`).
 
 ---
 
-## 📁 Project Structure
+## 🏗️ Architecture
 
 ```
 swipe/
 ├── app/
 │   ├── __init__.py
+│   ├── config/
+│   ├── docs/               # Swagger resource declarations
 │   ├── models/
 │   ├── routes/
+│   ├── schema/
 │   ├── services/
 │   ├── utils/
-│   ├── config.py
-│   └── extensions.py
+│   ├── extensions.py
+│   └── swagger.py
 ├── migrations/
-├── run.py
-├── .env.example
-├── .flaskenv.example
+├── run.py                   # Dev/prod entry point (Flask vs Waitress)
 ├── requirements.txt
+├── Swipe.json               # Postman collection
+├── NOTIFICATION_SYSTEM.md   # Deep dive documentation
 └── README.md
 ```
 
 ---
 
-## ⚙️ Getting Started
+## ✅ Requirements
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/yourusername/swipe.git
-cd swipe
-```
-
-### 2. Set up your virtual environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Set up environment variables
-
-Copy and modify the `.env` and `.flaskenv`:
-
-```bash
-cp .env.example .env
-cp .flaskenv.example .flaskenv
-```
-
-Update them with your local and API settings.
+- Python 3.10+
+- Virtualenv / Conda
+- SQLite (default) or PostgreSQL for production
+- Stripe test keys for payment flows
 
 ---
 
-### 5. Run database migrations
+## ⚙️ Setup
+
+- **Clone**
+  ```bash
+  git clone https://github.com/yourusername/swipe.git
+  cd swipe
+  ```
+
+- **Create virtual environment**
+  ```bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  ```
+
+- **Install dependencies** (pinned in `requirements.txt`)
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- **Environment files**
+  ```bash
+  cp .env.example .env
+  ```
+  Populate `.env` using the variables listed below.
+
+---
+
+## 🏃 Running the Application
+
+- **Development (Flask auto-reload)**
+  ```bash
+  source .venv/bin/activate
+  export FLASK_ENV=development
+  python run.py
+  ```
+
+- **Production-like (Waitress WSGI server)**
+  ```bash
+  source .venv/bin/activate
+  export FLASK_ENV=production
+  export HOST=0.0.0.0
+  export PORT=8000
+  python run.py
+  ```
+  Waitress is bundled via `waitress==3.0.2` after the dependency freeze.
+
+Application default URL: `http://127.0.0.1:5000`
+
+---
+
+## 🌐 Live Demo
+
+- **Landing Page**: https://swipe-bczl.onrender.com
+- **Swagger Docs**: https://swipe-bczl.onrender.com/docs
+
+This Render deployment mirrors the configuration described above and provides quick access to the marketing site and interactive API documentation.
+
+---
+
+## 🔐 Environment Variables
+
+| Key | Purpose |
+| --- | --- |
+| `SECRET_KEY` | Flask secret key for sessions and JWT signing |
+| `DATABASE_URL` | SQLAlchemy URI (`sqlite:///swipe.db` or PostgreSQL URI) |
+| `JWT_SECRET_KEY` | JWT signing key (fallbacks to `SECRET_KEY` if omitted) |
+| `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` | Stripe integration |
+| `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_USE_TLS` | Email delivery |
+| `NOTIFICATION_BROADCAST_LIMIT` | Safety guard for admin broadcasts |
+| `FRONTEND_BASE_URL` | Used by payment redirect routes |
+| `FX_API_KEY` | Optional foreign exchange API key |
+
+Consult `.env.example` for the full list plus sensible defaults.
+
+---
+
+## 🗃️ Database Migrations
 
 ```bash
-flask db init
-flask db migrate -m "Initial migration"
+flask db upgrade
+
+# Create new migration
+flask db migrate -m "describe change"
 flask db upgrade
 ```
 
-### 6. Start the Flask server
-
-```bash
-flask run
-```
-
-App will be running at `http://127.0.0.1:5000/`
+Initial migrations live in `migrations/versions/`.
 
 ---
 
-## 🔑 Example .env
+## 📘 API Documentation
 
-```env
-SECRET_KEY=your-secret-key
-DATABASE_URL=sqlite:///swipe.db
+- **Swagger UI**: visit `http://127.0.0.1:5000/docs/`
+- **Namespaces**: Authentication, Accounts, Wallets, Transactions, Cards, 2FA, Invoices, Invoice Payments, Notifications, Admin Notifications.
+- **Postman**: Import `Swipe.json` for preconfigured environments covering 2FA, invoice, payment, and webhook flows.
 
-CURRENCY_API_KEY=your-fixer-api-key
-VIRTUAL_CARD_API_KEY=your-card-service-api-key
-```
-
----
-
-## 📖 API Endpoints Overview
-
-| Method | Endpoint            | Description                     |
-| ------ | ------------------- | ------------------------------- |
-| `GET`  | `/`                 | Health check                    |
-| `POST` | `/auth/register`    | Create a new user               |
-| `POST` | `/auth/login`       | Authenticate user and get token |
-| `GET`  | `/accounts/`        | List user's accounts            |
-| `POST` | `/accounts/`        | Create a new financial account  |
-| `GET`  | `/transactions/`    | List transactions               |
-| `POST` | `/transactions/`    | Create a new transaction        |
-| `GET`  | `/currency/convert` | Convert between currencies      |
-| `POST` | `/cards/virtual`    | Generate a virtual card         |
-
-> Full API docs coming soon via Swagger/OpenAPI.
+Helper scripts: `direct_2fa_test.py`, `test_endpoint.py`, `test_webhook.py` demonstrate common workflows.
 
 ---
 
 ## 🧪 Testing
 
 ```bash
+source .venv/bin/activate
 pytest
 ```
 
-> You can find tests inside the `tests/` directory (coming soon).
+Targeted smoke scripts also live at the project root for manual verification.
 
 ---
 
-## 🛠️ Built With
+## 🛠️ Tooling & Integrations
 
-* [Flask](https://flask.palletsprojects.com/)
-* [Flask-Migrate](https://flask-migrate.readthedocs.io/)
-* [SQLAlchemy](https://www.sqlalchemy.org/)
-* [python-dotenv](https://github.com/theskumar/python-dotenv)
-* [Requests](https://requests.readthedocs.io/)
-* External APIs (e.g. [Fixer.io](https://fixer.io), [Stripe Issuing](https://stripe.com/issuing), etc.)
+- **Flask ecosystem**: Flask, Flask-JWT-Extended, Flask-Migrate, Flask-SQLAlchemy, Flask-Mail, Flask-RESTX.
+- **Data & Serialization**: Marshmallow, Marshmallow-SQLAlchemy.
+- **Payments**: Stripe SDK, custom `PaymentService` (`app/services/payment_service.py`).
+- **Notifications**: Email + in-app via `NotificationService` and `EmailService`.
+- **Security**: Passlib for hashing, PyOTP for TOTP, quiet-hours aware notification settings.
+- **Production**: Waitress WSGI server; configurable host/port via environment variables.
 
----
-
-## 📦 Deployment (Coming Soon)
-
-Planned deployment methods:
-
-* Docker
-* Heroku
-* Railway or Fly.io
+Pinned dependencies are maintained through `pip freeze` (see `requirements.txt`).
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m "Add some feature"`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature-name`)
+3. Commit changes (`git commit -m "feat: add awesome thing"`)
+4. Push and open a pull request
+
+Please include tests and Swagger doc updates where relevant.
 
 ---
 
@@ -181,6 +218,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 📬 Contact
 
-**Project Lead:** \[Onyedikachi Onu]
-**Email:** [okc4pardon@gmail.com](mailto:your@email.com)
-**GitHub:** [github.com/St-Pardon](https://github.com/St-Pardon)
+- **Project Lead**: Onyedikachi Onu
+- **Email**: [okc4pardon@gmail.com](mailto:okc4pardon@gmail.com)
+- **GitHub**: [github.com/St-Pardon](https://github.com/St-Pardon)
