@@ -47,7 +47,7 @@ def create_app():
     app.register_blueprint(two_factor_bp, url_prefix="/api")
     app.register_blueprint(invoice_bp, url_prefix="/api")
     app.register_blueprint(invoice_payments_bp, url_prefix="/api")
-    app.register_blueprint(notifications_bp, url_prefix="/api")
+    app.register_blueprint(notifications_bp, url_prefix="/api/notifications")
     app.register_blueprint(admin_bp, url_prefix="/api")
 
     return app

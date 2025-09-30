@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-notifications_bp = Blueprint('notifications', __name__, url_prefix='/api/notifications')
+notifications_bp = Blueprint('notifications', __name__)
 
 @notifications_bp.route('/count', methods=['GET'])
 @jwt_required()
