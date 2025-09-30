@@ -332,19 +332,42 @@ def delete_card(id):
                 "message": "Card not found"
             }), 404
 
+        # Store payment method ID for cleanup before deletion
+        stripe_payment_method_id = card.stripe_payment_method_id
+
+        # Clean up Stripe payment method if it exists
+        if stripe_payment_method_id:
+            try:
+                if getattr(stripe, 'api_key', None):
+                    # Attempt to detach the payment method from the customer
+                    # Note: This will make the payment method reusable for future cards
+                    detached_pm = stripe.PaymentMethod.detach(stripe_payment_method_id)
+                    logging.info(f"Successfully detached Stripe payment method {stripe_payment_method_id} from customer")
+                else:
+                    logging.info(f"Development mode: Skipping Stripe cleanup for payment method {stripe_payment_method_id}")
+            except stripe.error.StripeError as stripe_err:
+                # Log the error but don't fail the card deletion
+                logging.warning(f"Failed to detach Stripe payment method {stripe_payment_method_id}: {str(stripe_err)}")
+                logging.info("Continuing with card deletion despite Stripe cleanup failure")
+            except Exception as cleanup_err:
+                # Handle any other cleanup errors
+                logging.warning(f"Unexpected error during Stripe cleanup for {stripe_payment_method_id}: {str(cleanup_err)}")
+                logging.info("Continuing with card deletion despite cleanup error")
+
+        # Delete the card from database
         db.session.delete(card)
         db.session.commit()
 
         return jsonify({
             "status": 200,
-            "message": "Card deleted successfully"
+            "message": "Card deleted successfully" + (f" and payment method detached from Stripe" if stripe_payment_method_id else "")
         }), 200
     
     except Exception as e:
         db.session.rollback()
         return jsonify({
             "status": 500,
-            "message": "An error occurred while revealing the card number",
+            "message": "An error occurred while deleting the card",
             "error": str(e)
         }), 500
 
@@ -557,15 +580,19 @@ def get_card_payment_method(card_id):
                 }
             }), 200
         
-        # Get payment method details from Stripe (if configured)
+        # Prepare base payload with stored data only
         payment_method_details = {
             "id": card.stripe_payment_method_id,
             "linked": True,
             "type": "unknown"
         }
         
+        # Only attempt live Stripe lookup when API key configured
         try:
-            if getattr(stripe, 'api_key', None):
+            from app.config.payment_config import PaymentConfig
+
+            stripe_key = getattr(PaymentConfig, "STRIPE_SECRET_KEY", None)
+            if stripe_key and getattr(stripe, 'api_key', None):
                 pm = stripe.PaymentMethod.retrieve(card.stripe_payment_method_id)
                 payment_method_details.update({
                     "type": pm.type,
@@ -588,9 +615,13 @@ def get_card_payment_method(card_id):
                         "last4": pm.us_bank_account.last4,
                         "account_type": pm.us_bank_account.account_type
                     }
+            else:
+                payment_method_details["stripe_lookup_skipped"] = True
         except stripe.error.StripeError:
             # If Stripe call fails, return basic info
-            pass
+            payment_method_details["stripe_lookup_error"] = "stripe_error"
+        except Exception as lookup_err:
+            payment_method_details["stripe_lookup_error"] = str(lookup_err)
         
         return jsonify({
             "status": 200,
